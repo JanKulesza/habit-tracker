@@ -1,0 +1,8 @@
+{
+  "projectId": "29eeb468-53c4-4906-88ae-e2ee29d7251c",
+  "pkg": "habit-tracker",
+  "shape": "package",
+  "tsconfig": "tsconfig.json",
+  "srcDir": "components/ui",
+  "cssEntry": "app/globals.css"
+}
