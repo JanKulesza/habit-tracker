@@ -12,27 +12,82 @@ datasource db {
   provider = "postgresql"
 }
 
-model User { 
-  id        Int       @id @default(autoincrement()) 
-  createdAt DateTime  @default(now())
-  name      String
-  email     String    @unique
-  password  String
-  habits    Habit[]
-} 
+model User {
+  id            String    @id
+  name          String
+  email         String    @unique
+  emailVerified Boolean
+  image         String?
+  createdAt     DateTime  @db.Timestamptz(3)
+  updatedAt     DateTime  @db.Timestamptz(3)
+  sessions      Session[]
+  accounts      Account[]
+  
+  habits        Habit[]
+
+  @@map("user")
+}
+
+model Session {
+  id        String   @id
+  user      User     @relation(fields: [userId], references: [id])
+  userId    String
+  token     String   @unique
+  expiresAt DateTime @db.Timestamptz(3)
+  ipAddress String?
+  userAgent String?
+  createdAt DateTime @db.Timestamptz(3)
+  updatedAt DateTime @db.Timestamptz(3)
+
+  @@map("session")
+}
+
+model Account {
+  id                    String    @id
+  user                  User      @relation(fields: [userId], references: [id])
+  userId                String
+  accountId             String
+  providerId            String
+  accessToken           String?
+  refreshToken          String?
+  accessTokenExpiresAt  DateTime? @db.Timestamptz(3)
+  refreshTokenExpiresAt DateTime? @db.Timestamptz(3)
+  scope                 String?
+  idToken               String?
+  password              String?
+  createdAt             DateTime  @db.Timestamptz(3)
+  updatedAt             DateTime  @db.Timestamptz(3)
+
+  @@map("account")
+}
+
+model Verification {
+  id         String   @id
+  identifier String
+  value      String
+  expiresAt  DateTime @db.Timestamptz(3)
+  createdAt  DateTime @db.Timestamptz(3)
+  updatedAt  DateTime @db.Timestamptz(3)
+
+  @@map("verification")
+}
 
 model Habit {
-  id        Int       @id @default(autoincrement())
-  name      String    
-  userId    Int
-  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  entries   Entry[]
+  id      Int     @id @default(autoincrement())
+  name    String
+  userId  String
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  entries Entry[]
+
+  @@map("habit")
 }
 
 model Entry {
-  id        Int       @id @default(autoincrement())
-  date      DateTime  @db.Date // Date provided by the user in format YYYY-MM-DD
-  habitId   Int
-  habit     Habit     @relation(fields: [habitId], references: [id], onDelete: Cascade)
+  id      Int      @id @default(autoincrement())
+  date    DateTime @db.Date // Date provided by the user in format YYYY-MM-DD
+  habitId Int
+  habit   Habit    @relation(fields: [habitId], references: [id], onDelete: Cascade)
+
   @@unique([habitId, date])
+  @@map("entry")
 }
