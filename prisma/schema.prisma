@@ -13,7 +13,25 @@ datasource db {
 }
 
 model User { 
-  id    Int     @id @default(autoincrement()) 
-  email String  @unique
-  name  String?
+  id        Int       @id @default(autoincrement()) 
+  createdAt DateTime  @default(now())
+  name      String
+  email     String    @unique
+  password  String
+  habits    Habit[]
 } 
+
+model Habit {
+  id        Int       @id @default(autoincrement())
+  name      String    
+  userId    Int
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  entries   Entry[]
+}
+
+model Entry {
+  id        Int       @id @default(autoincrement())
+  date      DateTime  @default(now())
+  habitId   Int
+  habit     Habit     @relation(fields: [habitId], references: [id], onDelete: Cascade)
+}
