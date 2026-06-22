@@ -10,3 +10,9 @@ export const loginSchema = z.object({
 });
 
 export type LoginType = z.infer<typeof loginSchema>
+
+export const registerSchema = loginSchema.extend({
+    name: z.string("Invalid name!").min(3,"Name is too short, minimum 3!")
+})
+
+export type RegisterType = z.infer<typeof registerSchema>
