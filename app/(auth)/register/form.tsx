@@ -2,7 +2,8 @@
 import FormInput from '@/components/inputs/form-input';
 import { Button } from '@/components/ui/button';
 import { FieldGroup } from '@/components/ui/field';
-import {  RegisterType,  registerSchema } from '@/lib/validations';
+import { authClient } from '@/lib/auth-client';
+import { RegisterType, registerSchema } from '@/lib/validations';
 import { zodResolver } from '@hookform/resolvers/zod';
 import Link from 'next/link';
 import { useForm, FormProvider } from 'react-hook-form';
@@ -12,12 +13,22 @@ export default function LoginForm() {
         resolver: zodResolver(registerSchema),
         defaultValues: {
             email: "",
-            password: ""
+            password: "",
+            name: ""
         }
     })
 
-    const onSubmit = async (data: RegisterType) => {
-        
+    const onSubmit = async (values: RegisterType) => {
+        const {email,name,password} = values;
+        const { data, error } = await authClient.signUp.email({
+            name, 
+            email,
+            password,
+        });
+        if(error)
+            console.log(error);
+        else 
+            console.log(data);
     }
     return (
         <FormProvider {...form}>

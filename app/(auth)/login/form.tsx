@@ -2,6 +2,7 @@
 import FormInput from '@/components/inputs/form-input';
 import { Button } from '@/components/ui/button';
 import { FieldGroup } from '@/components/ui/field';
+import { authClient } from '@/lib/auth-client';
 import { LoginType, loginSchema } from '@/lib/validations';
 import { zodResolver } from '@hookform/resolvers/zod';
 import Link from 'next/link';
@@ -16,8 +17,16 @@ export default function LoginForm() {
         }
     })
 
-    const onSubmit = async (data: LoginType) => {
-        
+    const onSubmit = async (values: LoginType) => {
+        const { email, password } = values
+        const { data, error } = await authClient.signIn.email({
+            email, 
+            password,
+        });
+        if(error)
+            console.log(error);
+        else 
+            console.log(data);
     }
     return (
         <FormProvider {...form}>
