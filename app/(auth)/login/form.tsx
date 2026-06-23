@@ -1,4 +1,5 @@
 "use client"
+import { FormCheckBox } from '@/components/inputs/form-checkbox';
 import FormInput from '@/components/inputs/form-input';
 import { Button } from '@/components/ui/button';
 import { FieldGroup } from '@/components/ui/field';
@@ -13,15 +14,14 @@ export default function LoginForm() {
         resolver: zodResolver(loginSchema),
         defaultValues: {
             email: "",
-            password: ""
+            password: "",
+            rememberMe: false
         }
     })
 
     const onSubmit = async (values: LoginType) => {
-        const { email, password } = values
         const { data, error } = await authClient.signIn.email({
-            email, 
-            password,
+            ...values
         });
         if(error)
             console.log(error);
@@ -34,6 +34,7 @@ export default function LoginForm() {
                 <FieldGroup>
                     <FormInput label="Email" placeholder="johnsmith@example.com" name="email" />
                     <FormInput label="Password" name="password" type="password" placeholder="pAssword123_" />
+                    <FormCheckBox name="rememberMe" label="Remember me" description="Keep me logged in on this device." defaultChecked={form.watch("rememberMe")} />
                     <Button
                         type="submit"
                         form="login-form"
@@ -42,7 +43,7 @@ export default function LoginForm() {
                     >
                         {form.formState.isSubmitting ? "Logging in..." : "Log in"}
                     </Button>
-                    <p className="text-sm text-center text-muted-foreground">Don't have an account? <Link href="/register" className="text-primary underline cursor-pointer">Sign up</Link></p>
+                    <p className="text-sm text-center text-muted-foreground">Don't have an account? <Link href="/register" className="text-primary underline cursor-pointer">Register</Link></p>
                 </FieldGroup>
             </form>
         </FormProvider>

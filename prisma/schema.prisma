@@ -17,6 +17,7 @@ model User {
   name          String
   email         String    @unique
   emailVerified Boolean
+  acceptTerms   Boolean
   image         String?
   createdAt     DateTime  @db.Timestamptz(3)
   updatedAt     DateTime  @db.Timestamptz(3)

@@ -29,7 +29,7 @@ export const auth = betterAuth({
                 const { success, error } = await validator.safeParseAsync({
                     ...request.body
                 })
-                
+
                 if (!success) {
                     const errorMessages = error.issues.map(err => `${err.path.join('.')}: ${err.message}`).join(", ");
                     throw new APIError("BAD_REQUEST", {
@@ -43,6 +43,15 @@ export const auth = betterAuth({
         google: {
             clientId: process.env["AUTH_GOOGLE_ID"],
             clientSecret: process.env["AUTH_GOOGLE_SECRET"]
+        }
+    },
+    user: {
+        additionalFields: {
+            acceptTerms: {
+                type: "boolean",
+                required: true,
+                defaultValue: true
+            }
         }
     }
 });

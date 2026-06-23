@@ -4,6 +4,7 @@ CREATE TABLE "user" (
     "name" TEXT NOT NULL,
     "email" TEXT NOT NULL,
     "emailVerified" BOOLEAN NOT NULL,
+    "acceptTerms" BOOLEAN NOT NULL,
     "image" TEXT,
     "createdAt" TIMESTAMPTZ(3) NOT NULL,
     "updatedAt" TIMESTAMPTZ(3) NOT NULL,

@@ -1,4 +1,5 @@
 "use client"
+import { FormCheckBox } from '@/components/inputs/form-checkbox';
 import FormInput from '@/components/inputs/form-input';
 import { Button } from '@/components/ui/button';
 import { FieldGroup } from '@/components/ui/field';
@@ -14,16 +15,15 @@ export default function LoginForm() {
         defaultValues: {
             email: "",
             password: "",
-            name: ""
+            name: "",
+            rememberMe: false,
+            acceptTerms: false
         }
     })
 
     const onSubmit = async (values: RegisterType) => {
-        const {email,name,password} = values;
         const { data, error } = await authClient.signUp.email({
-            name, 
-            email,
-            password,
+            ...values
         });
         if(error)
             console.log(error);
@@ -32,16 +32,19 @@ export default function LoginForm() {
     }
     return (
         <FormProvider {...form}>
-            <form id="login-form" onSubmit={form.handleSubmit(onSubmit)}>
+            <form id="login-form"  onSubmit={form.handleSubmit(onSubmit)}>
                 <FieldGroup>
                     <FormInput label="Name" placeholder="John Smith" name="name" />
                     <FormInput label="Email" placeholder="johnsmith@example.com" name="email" />
                     <FormInput label="Password" name="password" type="password" placeholder="pAssword123_" />
+                    <FormCheckBox name="rememberMe" label="Remember me" defaultChecked={form.watch("rememberMe")} />
+                    <FormCheckBox name="acceptTerms" label="Accept Terms and Conditions" description="I agree to the terms and conditions." defaultChecked={form.watch("acceptTerms")} link="/terms" />
                     <Button
                         type="submit"
                         form="login-form"
                         className="p-5 w-full"
                         disabled={form.formState.isSubmitting}
+                        onClick={() => {console.log(form.getValues())}}
                     >
                         {form.formState.isSubmitting ? "Registerring..." : "Register"}
                     </Button>
