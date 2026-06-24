@@ -13,7 +13,7 @@ export default function AppSidebarBtn({text,href,icon: Icon}: AppSidebarBtnProps
     return (
         <Button asChild variant="ghost" className="text-muted-foreground justify-start items-center gap-4 h-10 font-normal">
             <Link href={href} className="">
-                <Icon className="h-[18px]! w-[18px]!" />
+                <Icon className="h-4.5! w-4.5!" />
                 <span className="transition-all duration-300 ease-in-out overflow-hidden whitespace-nowrap data-[state=collapsed]:w-0 data-[state=collapsed]:opacity-0 data-[state=expanded]:w-auto">
                     {text}
                 </span>
