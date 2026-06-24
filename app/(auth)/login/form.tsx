@@ -7,9 +7,11 @@ import { authClient } from '@/lib/auth-client';
 import { LoginType, loginSchema } from '@/lib/validations';
 import { zodResolver } from '@hookform/resolvers/zod';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { useForm, FormProvider } from 'react-hook-form';
 
 export default function LoginForm() {
+    const router = useRouter();
     const form = useForm<LoginType>({
         resolver: zodResolver(loginSchema),
         defaultValues: {
@@ -20,13 +22,13 @@ export default function LoginForm() {
     })
 
     const onSubmit = async (values: LoginType) => {
-        const { data, error } = await authClient.signIn.email({
+        const { error } = await authClient.signIn.email({
             ...values
         });
-        if(error)
+        if (error)
             console.log(error);
-        else 
-            console.log(data);
+        else
+            router.push("/");
     }
     return (
         <FormProvider {...form}>

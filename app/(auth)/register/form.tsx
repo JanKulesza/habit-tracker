@@ -7,9 +7,11 @@ import { authClient } from '@/lib/auth-client';
 import { RegisterType, registerSchema } from '@/lib/validations';
 import { zodResolver } from '@hookform/resolvers/zod';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { useForm, FormProvider } from 'react-hook-form';
 
 export default function LoginForm() {
+    const router = useRouter();
     const form = useForm<RegisterType>({
         resolver: zodResolver(registerSchema),
         defaultValues: {
@@ -22,17 +24,17 @@ export default function LoginForm() {
     })
 
     const onSubmit = async (values: RegisterType) => {
-        const { data, error } = await authClient.signUp.email({
+        const { error } = await authClient.signUp.email({
             ...values
         });
-        if(error)
+        if (error)
             console.log(error);
-        else 
-            console.log(data);
+        else
+            router.push("/");
     }
     return (
         <FormProvider {...form}>
-            <form id="login-form"  onSubmit={form.handleSubmit(onSubmit)}>
+            <form id="login-form" onSubmit={form.handleSubmit(onSubmit)}>
                 <FieldGroup>
                     <FormInput label="Name" placeholder="John Smith" name="name" />
                     <FormInput label="Email" placeholder="johnsmith@example.com" name="email" />
@@ -44,7 +46,7 @@ export default function LoginForm() {
                         form="login-form"
                         className="p-5 w-full"
                         disabled={form.formState.isSubmitting}
-                        onClick={() => {console.log(form.getValues())}}
+                        onClick={() => { console.log(form.getValues()) }}
                     >
                         {form.formState.isSubmitting ? "Registerring..." : "Register"}
                     </Button>
