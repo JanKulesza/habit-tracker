@@ -3,9 +3,11 @@ import { SidebarHeader, SidebarContent, SidebarFooter, Sidebar } from "./ui/side
 import AppSidebarBtn from "./app-sidebar-btn";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import SignOutBtn from "./sign-out-btn";
+import { User } from "@/generated/prisma/client";
+import { TooltipTrigger, TooltipContent, Tooltip } from "./ui/tooltip";
 
 // group-data-state is used to automatically detect parent's (Sidebar) collapse state and improve UX
-export default function AppSidebar() {
+export default function AppSidebar({ user }: { user: User }) {
     return (
         <Sidebar collapsible="icon">
             <SidebarHeader className="flex-row justify-start items-center my-4 p-1.5
@@ -32,23 +34,35 @@ export default function AppSidebar() {
             <SidebarFooter className="flex-row justify-between 
                 transition-all duration-300 ease-in-out 
                 p-1.5 gap-0 items-center h-20
-                group-data-[state=expanded]:p-4 group-data-[state=expanded]:gap-2">
+                group-data-[state=expanded]:p-4">
                 <div className="flex gap-2 items-center 
-                transition-all duration-0 group-data-[state=expanded]:duration-500 ease-in-out 
+                transition-all duration-100 group-data-[state=expanded]:duration-500 ease-in-out 
                 group-data-[state=collapsed]:w-0 group-data-[state=collapsed]:opacity-0 
                 group-data-[state=expanded]:w-auto group-data-[state=expanded]:opacity-100">
                     <Avatar size="lg">
-                    <AvatarImage
-                        src="/"
-                        alt="profile image"
-                        className="grayscale"
-                    />
-                    <AvatarFallback>CN</AvatarFallback>
-                </Avatar>
-                <div>
-                    <p className="text-sm">Jan Kulesza</p>
-                    <p className="text-muted-foreground text-xs">example@example.com</p>
-                </div>
+                        <AvatarImage
+                            src="/"
+                            alt="profile image"
+                            className="grayscale"
+                        />
+                        <AvatarFallback>CN</AvatarFallback>
+                    </Avatar>
+                    <Tooltip>
+                        <TooltipTrigger asChild>
+                            <div className="group-data-[state=collapsed]:hidden">
+                                <p className="text-sm">
+                                    {user.name.length > 20 ? user.name.slice(0, 20) + "..." : user.name}
+                                </p>
+                                <p className="text-muted-foreground text-xs">
+                                    {user.email.length > 20 ? user.email.slice(0, 20) + "..." : user.email}
+                                </p>
+                            </div>
+                        </TooltipTrigger>
+                        <TooltipContent className="flex-col">
+                            <p className="text-foreground text-sm">{user.name}</p>
+                            <p className="text-muted-foreground text-xs">{user.email}</p>
+                        </TooltipContent>
+                    </Tooltip>
                 </div>
                 <SignOutBtn className="w-9 h-9 cursor-pointer z-10 transition-all duration-300 ease-in-out" />
             </SidebarFooter>
