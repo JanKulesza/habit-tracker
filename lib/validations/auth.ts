@@ -10,11 +10,11 @@ export const loginSchema = z.object({
     rememberMe: z.boolean(),
 });
 
-export type LoginType = z.infer<typeof loginSchema>
+export type LoginSchema = z.infer<typeof loginSchema>
 
 export const registerSchema = loginSchema.extend({
     name: z.string("Invalid name!").min(3,"Name is too short, minimum 3!"),
     acceptTerms: z.boolean().refine(val => val, "In order to register, You must accept our terms and conditions.")
 })
 
-export type RegisterType = z.infer<typeof registerSchema>
+export type RegisterSchema = z.infer<typeof registerSchema>

@@ -1,20 +1,17 @@
 import AppSidebar from "@/components/app-sidebar";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
-import { User } from "@/generated/prisma/client";
-import { requireSession } from "@/lib/dal/session";
 
 export default async function DashboardLayout({
     children,
 }: Readonly<{
     children: React.ReactNode;
 }>) {
-    const session = await requireSession();
-
     return (
         <SidebarProvider>
-            <AppSidebar user={session.user as User} />
-            <main>
-                <SidebarTrigger />
+            <AppSidebar />
+            <SidebarTrigger />
+            <main className="flex flex-col gap-8 py-8 p-2 lg:p-12 w-full ml-[-1.75rem]"> 
+                {/* ml - size of SidebarTrigger */}
                 {children}
             </main>
         </SidebarProvider>

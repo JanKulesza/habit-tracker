@@ -4,7 +4,7 @@ import FormInput from '@/components/inputs/form-input';
 import { Button } from '@/components/ui/button';
 import { FieldGroup } from '@/components/ui/field';
 import { authClient } from '@/lib/auth-client';
-import { RegisterType, registerSchema } from '@/lib/validations';
+import { RegisterSchema, registerSchema } from '@/lib/validations';
 import { zodResolver } from '@hookform/resolvers/zod';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
@@ -12,7 +12,7 @@ import { useForm, FormProvider } from 'react-hook-form';
 
 export default function LoginForm() {
     const router = useRouter();
-    const form = useForm<RegisterType>({
+    const form = useForm<RegisterSchema>({
         resolver: zodResolver(registerSchema),
         defaultValues: {
             email: "",
@@ -23,7 +23,7 @@ export default function LoginForm() {
         }
     })
 
-    const onSubmit = async (values: RegisterType) => {
+    const onSubmit = async (values: RegisterSchema) => {
         const { error } = await authClient.signUp.email({
             ...values
         });

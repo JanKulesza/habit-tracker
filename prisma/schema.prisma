@@ -23,8 +23,8 @@ model User {
   updatedAt     DateTime  @db.Timestamptz(3)
   sessions      Session[]
   accounts      Account[]
-  
-  habits        Habit[]
+
+  habits Habit[]
 
   @@map("user")
 }
@@ -74,11 +74,14 @@ model Verification {
 }
 
 model Habit {
-  id      Int     @id @default(autoincrement())
-  name    String
-  userId  String
-  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
-  entries Entry[]
+  id        Int     @id @default(autoincrement())
+  icon      String
+  name      String
+  goal      String
+  frequency String  @default("daily")
+  userId    String
+  user      User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  entries   Entry[]
 
   @@map("habit")
 }

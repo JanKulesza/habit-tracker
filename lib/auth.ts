@@ -5,6 +5,7 @@ import { ZodObject } from "zod";
 import { loginSchema, registerSchema } from "./validations";
 import { APIError } from "better-auth/api";
 import type { HookEndpointContext } from "better-auth"; 
+import { formatZodErrors } from "./utils";
 
 if (!process.env["AUTH_GOOGLE_ID"] || !process.env["AUTH_GOOGLE_SECRET"])
     throw new Error("Auth enviromental variables are not defined.");
@@ -30,12 +31,11 @@ export const auth = betterAuth({
                     ...request.body
                 })
 
-                if (!success) {
-                    const errorMessages = error.issues.map(err => `${err.path.join('.')}: ${err.message}`).join(", ");
+                if (!success) 
                     throw new APIError("BAD_REQUEST", {
-                        message: `Validation Error: ${errorMessages}`
+                        message: `Validation Error: ${formatZodErrors(error)}`
                     });
-                }
+                
             }
         }
     },

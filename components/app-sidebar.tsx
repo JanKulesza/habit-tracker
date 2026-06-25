@@ -5,9 +5,11 @@ import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import SignOutBtn from "./sign-out-btn";
 import { User } from "@/generated/prisma/client";
 import { TooltipTrigger, TooltipContent, Tooltip } from "./ui/tooltip";
+import { requireSession } from "@/lib/dal/session";
 
 // group-data-state is used to automatically detect parent's (Sidebar) collapse state and improve UX
-export default function AppSidebar({ user }: { user: User }) {
+export default async function AppSidebar() {
+    const {user} = await requireSession();
     return (
         <Sidebar collapsible="icon">
             <SidebarHeader className="flex-row justify-start items-center my-4 p-1.5
@@ -17,12 +19,12 @@ export default function AppSidebar({ user }: { user: User }) {
                 <div className="flex items-center justify-center w-9 h-9 rounded-lg bg-primary shrink-0">
                     <Zap className="h-5 w-5 text-white" />
                 </div>
-                <h1 className="text-lg font-semibold 
+                <h2 className="text-lg font-semibold 
                 transition-all duration-300 ease-in-out 
                 group-data-[state=collapsed]:w-0 group-data-[state=collapsed]:opacity-0 
                 group-data-[state=expanded]:w-auto group-data-[state=expanded]:opacity-100 ">
                     Streak
-                </h1>
+                </h2>
             </SidebarHeader>
             <SidebarContent className="transition-all duration-300 ease-in-out p-1
             group-data-[state=expanded]:mx-2 group-data-[state=expanded]:p-2">
