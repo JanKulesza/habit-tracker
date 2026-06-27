@@ -88,7 +88,8 @@ model Habit {
 
 model Entry {
   id      Int      @id @default(autoincrement())
-  date    DateTime @db.Date // Date provided by the user in format YYYY-MM-DD
+  date    String  // Date provided by the user in format YYYY-MM-DD
+  streak  Int      @default(1)
   habitId Int
   habit   Habit    @relation(fields: [habitId], references: [id], onDelete: Cascade)
 

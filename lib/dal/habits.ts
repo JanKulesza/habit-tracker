@@ -5,29 +5,30 @@ import { ServerActionResponse } from "../types/response"
 import { habitsSchema } from "../validations"
 import { requireSession } from "./session"
 import { formatZodErrors } from "../utils"
+import { cache } from "react"
 
-export async function getHabits() {
+export const getHabitsForCurrentUser = cache(async (): Promise<ServerActionResponse<Habit[]>> => {
     'use server'
-    const { user } = await requireSession()
+    const session = await requireSession();
 
-    return await prisma.habit.findMany({
-        where: {
-            userId: user.id
-        }
-    });
-}
+    return {
+        success: true, data: await prisma.habit.findMany({
+            where: { userId: session.user.id },
+        })
+    };
+});
 
 export async function createHabit(formData: FormData): Promise<ServerActionResponse<Habit>> {
     'use server'
     const { user } = await requireSession();
 
-    const { success, error, data } = await habitsSchema.safeParseAsync({ 
-        name: formData.get('name')?.toString(), 
-        goal: formData.get('goal')?.toString(), 
-        icon: formData.get('icon')?.toString() 
+    const { success, error, data } = await habitsSchema.safeParseAsync({
+        name: formData.get('name')?.toString(),
+        goal: formData.get('goal')?.toString(),
+        icon: formData.get('icon')?.toString()
     });
 
-    if (!success) 
+    if (!success)
         return { success: false, error: formatZodErrors(error) };
 
 
