@@ -11,6 +11,7 @@ import { sort } from 'fast-sort';
 import { Target, Flame, Medal, TrendingUp } from 'lucide-react';
 import { Entry, Habit } from '@/generated/prisma/client';
 import { useState } from 'react';
+import WeekTiles from '../week-tiles';
 
 interface HomePageCientProps {
     userName: string
@@ -22,7 +23,7 @@ export default function HomePageClient({ userName, entries: se, habits }: HomePa
     const [entries, setEntries] = useState(se);
     const entriesThisMo = formatEntriesByDate(entries, startOfMonth(new Date)),
         entriesToday = entriesThisMo[format(new Date, "yyyy-MM-dd")],
-        entriesThisWeek = formatEntriesByDate(entries, startOfWeek(new Date));
+        entriesThisWeek = formatEntriesByDate(entries, startOfWeek(new Date, { locale: pl }));
 
     const progress = habits?.length ? Number(((entriesToday?.length ?? 0) * 100 / habits.length).toFixed()) : 0,
         bestStreak = sort(entriesToday).desc(e => e.streak)?.[0]?.streak ?? 0,
@@ -97,7 +98,7 @@ export default function HomePageClient({ userName, entries: se, habits }: HomePa
                 )}
             </div>
             <div className="flex flex-col md:flex-row gap-8">
-                <div className="w-3/5 space-y-4 border rounded-lg p-6">
+                <div className="w-full md:w-3/5 space-y-4 border rounded-lg p-6">
                     <div className="flex justify-between items-center">
                         <h2 className="font-medium">Habits today</h2>
                         <Link href="/habits" className="text-primary text-sm">See all</Link>
@@ -110,12 +111,15 @@ export default function HomePageClient({ userName, entries: se, habits }: HomePa
                             habit={hab}
                             entryId={entryId}
                             streakYesterday={streakYesterday}
-                            onResult ={(result: Entry[]) => {
+                            onResult={(result: Entry[]) => {
                                 setEntries(result)
                             }}
                             currentEntriesSnapshot={entries}
                         />
                     })}
+                </div>
+                <div className='space-y-8 md:w-2/5'>
+                    <WeekTiles entriesThisWeek={entriesThisWeek} habitsNum={habits.length} habitId={null}/>
                 </div>
             </div>
         </>

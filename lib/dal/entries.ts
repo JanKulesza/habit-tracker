@@ -3,10 +3,10 @@ import { prisma } from "../prisma"
 import { ServerActionResponse } from "../types/response"
 import { requireSession } from "./session"
 import { Entry, Habit } from "@/generated/prisma/browser"
-import { format, isBefore, subDays } from "date-fns"
+import { format, isAfter, isBefore, subDays } from "date-fns"
 import { cache } from "react"
 
-export const getEntriesForCurrentUser = cache(async (timeframe: { start: Date; end?: Date }, habitId?: Habit['id']): Promise<ServerActionResponse<Entry[]>> => {
+export const getEntriesForCurrentUser = cache(async (timeframe: { start?: Date; end?: Date }, habitId?: Habit['id']): Promise<ServerActionResponse<Entry[]>> => {
     'use server'
     const { user } = await requireSession()
 
@@ -18,7 +18,7 @@ export const getEntriesForCurrentUser = cache(async (timeframe: { start: Date; e
                     userId: user.id
                 },
                 date: {
-                    in: [format(timeframe.start, 'yyyy-MM-dd'), format(timeframe?.end ? timeframe.end : new Date(), 'yyyy-MM-dd')]
+                    in: [format(timeframe?.start ?? user.createdAt, 'yyyy-MM-dd'), format(timeframe?.end ?? new Date(), 'yyyy-MM-dd')]
                 }
             },
             orderBy: {
@@ -31,6 +31,9 @@ export const getEntriesForCurrentUser = cache(async (timeframe: { start: Date; e
 export async function createEntry(habitId: Habit['id'], date: Date): Promise<ServerActionResponse<Entry>> {
     'use server'
     const { user } = await requireSession()
+
+    if(isAfter(date,new Date()))
+        return {success:false, error: "Unable to create entry in future."}
 
     const habit = await prisma.habit.findFirst({
         where: {
@@ -115,4 +118,21 @@ export async function deleteEntry(entryId: Entry['id']): Promise<ServerActionRes
     return {
         success: true, data: null
     }
+}
+
+export async function switchEntry(habitId: Habit['id'], date: Date): Promise<ServerActionResponse<Entry | null>> {
+    'use server'
+    const { user } = await requireSession()
+
+    const entry = await prisma.entry.findFirst({
+        where: {
+            habitId,
+            date: format(date, 'yyyy-MM-dd')
+        }
+    })
+
+    if (!entry) 
+        return createEntry(habitId,date);
+
+    return deleteEntry(entry.id)
 }
