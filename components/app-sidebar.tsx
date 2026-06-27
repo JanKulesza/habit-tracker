@@ -3,7 +3,6 @@ import { SidebarHeader, SidebarContent, SidebarFooter, Sidebar } from "./ui/side
 import AppSidebarBtn from "./app-sidebar-btn";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import SignOutBtn from "./sign-out-btn";
-import { User } from "@/generated/prisma/client";
 import { TooltipTrigger, TooltipContent, Tooltip } from "./ui/tooltip";
 import { requireSession } from "@/lib/dal/session";
 

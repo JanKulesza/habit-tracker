@@ -9,7 +9,7 @@ export default async function DashboardLayout({
     return (
         <SidebarProvider>
             <AppSidebar />
-            <SidebarTrigger />
+            <SidebarTrigger className="z-10" />
             <main className="flex flex-col gap-8 py-8 p-2 lg:p-12 lg:px-28 w-full -ml-7"> 
                 {/* ml - size of SidebarTrigger */}
                 {children}

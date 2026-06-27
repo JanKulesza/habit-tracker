@@ -14,7 +14,7 @@ export const getHabitsForCurrentUser = cache(async (): Promise<ServerActionRespo
     return {
         success: true, data: await prisma.habit.findMany({
             where: { userId: session.user.id },
-        })
+        }) 
     };
 });
 

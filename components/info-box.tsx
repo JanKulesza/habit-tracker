@@ -12,11 +12,11 @@ interface InfoBoxProps {
 export default function InfoBox({ title, text, description, Icon, iconColor }: InfoBoxProps) {
     return (
         <div className="space-y-2 border rounded-lg p-6 text-sm text-muted-foreground">
-            <p className="flex justify-between">
-                <span className="font-medium">{title}</span>
+            <div className="flex justify-between items-center">
+                <h2 className="font-medium">{title}</h2>
                 <Icon className={iconColor ?? "text-primary"} />
-            </p>
-            <p className="text-xl text-foreground font-medium">{text}</p>
+            </div>
+            <p className="text-2xl text-foreground font-medium">{text}</p>
             <p>{description}</p>
         </div>
     )

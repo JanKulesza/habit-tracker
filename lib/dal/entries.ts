@@ -18,7 +18,7 @@ export const getEntriesForCurrentUser = cache(async (timeframe: { start: Date; e
                     userId: user.id
                 },
                 date: {
-                    in: [format(timeframe.start, 'yyyy-MM-dd'), format(timeframe?.end ?  timeframe.end : new Date(), 'yyyy-MM-dd')]
+                    in: [format(timeframe.start, 'yyyy-MM-dd'), format(timeframe?.end ? timeframe.end : new Date(), 'yyyy-MM-dd')]
                 }
             },
             orderBy: {
@@ -53,7 +53,7 @@ export async function createEntry(habitId: Habit['id'], date: Date): Promise<Ser
     if (existingEntry) {
         return { success: false, error: "Entry already exists for this date" }
     }
-    
+
     const entryDayBefore = await prisma.entry.findFirst({
         where: {
             habitId,
@@ -98,7 +98,7 @@ export async function deleteEntry(entryId: Entry['id']): Promise<ServerActionRes
             id: entryId
         }
     });
-    if(isBefore(deletedEntry.date, format(new Date(), 'yyyy-MM-dd'))) {
+    if (isBefore(deletedEntry.date, format(new Date(), 'yyyy-MM-dd'))) {
         await prisma.entry.updateMany({
             where: {
                 habitId: deletedEntry.habitId,
