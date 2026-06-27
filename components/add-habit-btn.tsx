@@ -12,7 +12,7 @@ import { Spinner } from './ui/spinner'
 import FormSelect from './inputs/form-select'
 
 export default function AddHabitBtn() {
-    const [open, setOpen] = useState(true);
+    const [open, setOpen] = useState(false);
     const form = useForm<HabitsSchema>({
         resolver: zodResolver(habitsSchema),
         defaultValues: {
