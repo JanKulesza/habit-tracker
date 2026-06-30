@@ -10,8 +10,15 @@ import { createHabit } from '@/lib/dal/habits'
 import { useState } from 'react'
 import { Spinner } from './ui/spinner'
 import FormSelect from './inputs/form-select'
+import { Habit } from '@/generated/prisma/client'
+import { requireSession } from '@/lib/dal/session'
 
-export default function AddHabitBtn() {
+interface AddHabitProps {
+    currentHabitsSnapshot: Habit[]
+    onResult: (result: Habit[]) => void
+}
+
+export default function AddHabitBtn({currentHabitsSnapshot, onResult} : AddHabitProps) {
     const [open, setOpen] = useState(false);
     const form = useForm<HabitsSchema>({
         resolver: zodResolver(habitsSchema),
@@ -25,17 +32,24 @@ export default function AddHabitBtn() {
     const iconOptions = Object.values(Icon).map(val => ({ label: val, value: val }));
 
     const onSubmit = async (values: HabitsSchema) => {
+        const {name,goal,icon} = values
         const formData = new FormData();
-        formData.append('name', values.name);
-        formData.append('goal', values.goal);
-        formData.append('icon', values.icon);
+        formData.append('name', name);
+        formData.append('goal', goal);
+        formData.append('icon', icon);
 
+        const snapshot = [...currentHabitsSnapshot];
+        onResult([...currentHabitsSnapshot, {name,goal,icon,frequency:"daily", id:-1, userId: "mock"}])
+        setOpen(false)
         const res = await createHabit(formData);
         if (!res.success) {
             console.log(res.error);
+            onResult(snapshot);
+            setOpen(true);
+            return;
         }
+        onResult([...snapshot, res.data])
         form.reset();
-        setOpen(false)
     }
     return (
         <Dialog open={open} onOpenChange={setOpen}>

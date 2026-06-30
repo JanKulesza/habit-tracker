@@ -1,7 +1,7 @@
 "use client"
 import { Entry, Habit } from '@/generated/prisma/client'
 import { Checkbox } from './ui/checkbox'
-import { createEntry, deleteEntry } from '@/lib/dal/entries'
+import { createEntry, deleteEntry, switchEntry } from '@/lib/dal/entries'
 import { format } from 'date-fns'
 import { ChevronRight, Flame } from 'lucide-react'
 import Link from 'next/link'
@@ -18,38 +18,30 @@ interface HabitBarProps {
 export default function HabitBar({ habit, entryId, streakYesterday, onResult, currentEntriesSnapshot }: HabitBarProps) {
     const [isPending, setIsPending] = useState(false)
     const isChecked = !!entryId
+
     const handleCheck = async () => {
         const snapshot = [...currentEntriesSnapshot];
-        if(isPending) 
+        if (isPending || habit.id === -1)
             return
-        
-        setIsPending(true);
-        let res;
-        if (isChecked) {
-            const updatedEntries = currentEntriesSnapshot.filter(e => e.id != entryId)
-            onResult(updatedEntries);
-            res = await deleteEntry(entryId);
 
-            if (!res?.success) {
-                console.log(res.error);
-                onResult(snapshot)
-            }
-        }
-        else {
+        if (isChecked)
+            onResult(currentEntriesSnapshot.filter(e => e.id !== entryId));
+        else
             onResult([...currentEntriesSnapshot, {
                 id: -1,
                 date: format(new Date(), 'yyyy-MM-dd'),
                 habitId: habit.id,
                 streak: streakYesterday + 1
             }])
-            res = await createEntry(habit.id, new Date())
+        setIsPending(true);
 
-            if (!res?.success) {
-                console.log(res.error);
-                onResult(snapshot)
-            } else
-                onResult([...snapshot, res.data])
-        }
+        const res = await switchEntry(habit.id, new Date());
+
+        if (!res?.success) {
+            console.log(res.error);
+            onResult(snapshot)
+        } else if (res.data)
+            onResult([...snapshot, res.data])
         setIsPending(false);
     }
     return (

@@ -20,8 +20,9 @@ interface HomePageCientProps {
     habits: Habit[]
 }
 
-export default function HomePageClient({ userName, entries: se, habits }: HomePageCientProps) {
+export default function HomePageClient({ userName, entries: se, habits: sh }: HomePageCientProps) {
     const [entries, setEntries] = useState(se);
+    const [habits, setHabits] = useState(sh);
     const entriesThisWeek = formatEntriesByDate(entries, startOfWeek(new Date, { locale: pl })),
         entriesToday = entriesThisWeek[format(new Date, "yyyy-MM-dd")];
 
@@ -73,7 +74,7 @@ export default function HomePageClient({ userName, entries: se, habits }: HomePa
                     <h1 className="text-2xl font-medium">Hi, {userName} 👋</h1>
                     <p className="text-sm text-muted-foreground">{format(new Date(), "eeee, d MMMM", { locale: pl })} · You have {habits.length - entriesToday.length} habits left today</p>
                 </div>
-                <AddHabitBtn />
+                <AddHabitBtn currentHabitsSnapshot={habits} onResult={(result) => {setHabits(result)}} />
             </div>
             <div className="w-full space-y-4 border rounded-lg p-6">
                 <div className="flex justify-between items-center">

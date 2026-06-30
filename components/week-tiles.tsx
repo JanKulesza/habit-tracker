@@ -54,7 +54,7 @@ export default function WeekTiles(props: WeekTilesProps) {
     const [isPending, setIsPending] = useState(false)
     const handleCheck = async (date: Date, checked: boolean) => {
         // If HABITID isn't null then all undefined values are defined
-        if (!habitId || isPending)
+        if (!habitId || isPending || habitId === -1)
             return
         const { currentEntriesSnapshot, onResult, streakYesterday } = props
         const snapshot = [...currentEntriesSnapshot];
