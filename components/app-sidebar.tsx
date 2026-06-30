@@ -10,7 +10,7 @@ import { requireSession } from "@/lib/dal/session";
 export default async function AppSidebar() {
     const {user} = await requireSession();
     return (
-        <Sidebar collapsible="icon">
+        <Sidebar collapsible="icon" className="h-screen">
             <SidebarHeader className="flex-row justify-start items-center my-4 p-1.5
             transition-all duration-300 ease-in-out
             group-data-[state=expanded]:mx-2

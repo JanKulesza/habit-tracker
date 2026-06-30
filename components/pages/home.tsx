@@ -5,13 +5,14 @@ import InfoBox from '../info-box';
 import { ProgressU } from '../ui/progress-updated';
 import AddHabitBtn from '../add-habit-btn';
 import { formatEntriesByDate } from '@/lib/utils';
-import { format, startOfMonth, startOfWeek, subDays } from 'date-fns';
+import { endOfDay, endOfMonth, endOfWeek, format, startOfMonth, startOfWeek, subDays, subMonths, subWeeks } from 'date-fns';
 import { pl } from 'date-fns/locale';
 import { sort } from 'fast-sort';
 import { Target, Flame, Medal, TrendingUp } from 'lucide-react';
 import { Entry, Habit } from '@/generated/prisma/client';
 import { useState } from 'react';
 import WeekTiles from '../week-tiles';
+import HeatMap from '../heat-map';
 
 interface HomePageCientProps {
     userName: string
@@ -21,9 +22,8 @@ interface HomePageCientProps {
 
 export default function HomePageClient({ userName, entries: se, habits }: HomePageCientProps) {
     const [entries, setEntries] = useState(se);
-    const entriesThisMo = formatEntriesByDate(entries, startOfMonth(new Date)),
-        entriesToday = entriesThisMo[format(new Date, "yyyy-MM-dd")],
-        entriesThisWeek = formatEntriesByDate(entries, startOfWeek(new Date, { locale: pl }));
+    const entriesThisWeek = formatEntriesByDate(entries, startOfWeek(new Date, { locale: pl })),
+        entriesToday = entriesThisWeek[format(new Date, "yyyy-MM-dd")];
 
     const progress = habits?.length ? Number(((entriesToday?.length ?? 0) * 100 / habits.length).toFixed()) : 0,
         bestStreak = sort(entriesToday).desc(e => e.streak)?.[0]?.streak ?? 0,
@@ -119,7 +119,14 @@ export default function HomePageClient({ userName, entries: se, habits }: HomePa
                     })}
                 </div>
                 <div className='space-y-8 md:w-2/5'>
-                    <WeekTiles entriesThisWeek={entriesThisWeek} habitsNum={habits.length} habitId={null}/>
+                    <WeekTiles entriesThisWeek={entriesThisWeek} habitsNum={habits.length} habitId={null} />
+                    <div className="w-full space-y-4 border rounded-lg p-6">
+                        <div className="flex justify-between items-center">
+                            <h2 className="font-medium">Activity</h2>
+                            <p className="text-muted-foreground text-sm">Last 20 weeks</p>
+                        </div>
+                        <HeatMap startDate={subWeeks(new Date(),20)} endDate={endOfWeek(new Date(), {locale: pl})} entries={entries} habitsNum={habits.length}  />
+                    </div>
                 </div>
             </div>
         </>

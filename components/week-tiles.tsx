@@ -5,7 +5,8 @@ import { cn } from "@/lib/utils";
 import { addDays, endOfWeek, format, isBefore, startOfWeek } from "date-fns";
 import { pl } from "date-fns/locale";
 import { Check, X } from "lucide-react";
-import {  useState } from "react";
+import { useState } from "react";
+import { ScrollArea, ScrollBar } from "./ui/scroll-area";
 
 type WeekTilesProps =
     | {
@@ -57,8 +58,8 @@ export default function WeekTiles(props: WeekTilesProps) {
             return
         const { currentEntriesSnapshot, onResult, streakYesterday } = props
         const snapshot = [...currentEntriesSnapshot];
-        const action: "Remove" | "Create" = 
-        currentEntriesSnapshot.some(en => en.date === format(new Date(), 'yyyy-MM-dd') && en.habitId === habitId) ? "Remove" : "Create"
+        const action: "Remove" | "Create" =
+            currentEntriesSnapshot.some(en => en.date === format(new Date(), 'yyyy-MM-dd') && en.habitId === habitId) ? "Remove" : "Create"
 
         if (action === "Remove")
             onResult([...currentEntriesSnapshot.filter(en => !(en.date === format(new Date(), 'yyyy-MM-dd') && en.habitId === habitId))])
@@ -84,26 +85,29 @@ export default function WeekTiles(props: WeekTilesProps) {
     return (
         <div className='w-full space-y-4 border rounded-lg p-6'>
             <h2 className="font-medium">This week</h2>
-            <div className="flex gap-2">
-                {entriesArr.map((entry, i) =>
-                    <div
-                        key={i}
-                        aria-disabled={entry.ofr}
-                        className={cn("border flex flex-col flex-1 gap-4 items-center rounded-lg p-2 pb-4 text-xs aria-disabled:opacity-60 aria-disabled:text-muted-foreground",
-                            entry.checked && "bg-primary border-primary text-white",
-                            entry.day === format(new Date(), 'EEEEEE') && "outline-2 outline-primary outline-offset-2",
-                            habitId && !entry.ofr && "cursor-pointer"
-                        )}
-                        onClick={() => {
-                            if (!entry.ofr)
-                                handleCheck(entry.date, entry.checked);
-                        }}
-                    >
-                        {entry.day}
-                        {entry.checked ? <Check className="size-4" /> : <X className="size-4 " />}
-                    </div>
-                )}
-            </div>
+            <ScrollArea>
+                <div className="flex gap-2 py-2">
+                    {entriesArr.map((entry, i) =>
+                        <div
+                            key={i}
+                            aria-disabled={entry.ofr}
+                            className={cn("border flex flex-col w-12 gap-4 items-center rounded-lg p-2 pb-4 text-xs aria-disabled:opacity-60 aria-disabled:text-muted-foreground",
+                                entry.checked && "bg-primary border-primary text-white",
+                                entry.day === format(new Date(), 'EEEEEE') && "outline-2 outline-primary outline-offset-2",
+                                habitId && !entry.ofr && "cursor-pointer"
+                            )}
+                            onClick={() => {
+                                if (!entry.ofr)
+                                    handleCheck(entry.date, entry.checked);
+                            }}
+                        >
+                            {entry.day}
+                            {entry.checked ? <Check className="size-4" /> : <X className="size-4 text-muted-foreground" />}
+                        </div>
+                    )}
+                </div>
+                <ScrollBar orientation="horizontal" className="mt-4" />
+            </ScrollArea>
         </div>
     )
 }
