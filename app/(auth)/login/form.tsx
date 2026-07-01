@@ -9,6 +9,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useForm, FormProvider } from 'react-hook-form';
+import { toast } from 'sonner';
 
 export default function LoginForm() {
     const router = useRouter();
@@ -26,9 +27,11 @@ export default function LoginForm() {
             ...values
         });
         if (error)
-            console.log(error);
-        else
+            toast.error(error.message)
+        else {
             router.push("/");
+            toast.success("Logged in successfully.")
+        }
     }
     return (
         <FormProvider {...form}>

@@ -12,6 +12,7 @@ import { Spinner } from './ui/spinner'
 import FormSelect from './inputs/form-select'
 import { Habit } from '@/generated/prisma/client'
 import { requireSession } from '@/lib/dal/session'
+import { toast } from 'sonner'
 
 interface AddHabitProps {
     currentHabitsSnapshot: Habit[]
@@ -43,11 +44,12 @@ export default function AddHabitBtn({currentHabitsSnapshot, onResult} : AddHabit
         setOpen(false)
         const res = await createHabit(formData);
         if (!res.success) {
-            console.log(res.error);
+            toast.error(res.error);
             onResult(snapshot);
             setOpen(true);
             return;
         }
+        toast.success("Habit created successfully!")
         onResult([...snapshot, res.data])
         form.reset();
     }

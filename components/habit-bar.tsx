@@ -6,6 +6,7 @@ import { format } from 'date-fns'
 import { ChevronRight, Flame } from 'lucide-react'
 import Link from 'next/link'
 import { useState } from 'react'
+import { toast } from 'sonner'
 
 interface HabitBarProps {
     entryId: number | null
@@ -38,11 +39,15 @@ export default function HabitBar({ habit, entryId, streakYesterday, onResult, cu
         const res = await switchEntry(habit.id, new Date());
 
         if (!res?.success) {
-            console.log(res.error);
+            toast.error(res.error);
             onResult(snapshot)
-        } else if (res.data)
+        } else if (res.data){
             onResult([...snapshot, res.data])
+            toast.success("Completed habit!")
+        } else 
+            toast.success("Unchecked habit.")
         setIsPending(false);
+
     }
     return (
         <div className='flex py-4 items-center border-b gap-4'>

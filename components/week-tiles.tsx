@@ -7,6 +7,7 @@ import { pl } from "date-fns/locale";
 import { Check, X } from "lucide-react";
 import { useState } from "react";
 import { ScrollArea, ScrollBar } from "./ui/scroll-area";
+import { toast } from "sonner";
 
 type WeekTilesProps =
     | {
@@ -74,10 +75,13 @@ export default function WeekTiles(props: WeekTilesProps) {
         setIsPending(true);
         const res = await switchEntry(habitId, date)
         if (!res?.success) {
-            console.log(res.error);
+            toast.error(res.error);
             onResult(snapshot)
-        } else if (res.data)
+        } else if (res.data){
             onResult([...snapshot, res.data])
+            toast.success("Completed habit!")
+        } else 
+            toast.success("Unchecked habit.")
 
         setIsPending(false);
     }

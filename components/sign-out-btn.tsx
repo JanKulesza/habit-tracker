@@ -3,6 +3,7 @@ import { LogOutIcon } from 'lucide-react'
 import { Button } from './ui/button'
 import { authClient } from '@/lib/auth-client';
 import { useRouter } from 'next/navigation';
+import { toast } from 'sonner';
 
 export default function SignOutBtn({ className }: { className?: string }) {
   const router = useRouter();
@@ -11,6 +12,10 @@ export default function SignOutBtn({ className }: { className?: string }) {
       fetchOptions: {
         onSuccess: () => {
           router.push("/login"); 
+          toast.success("Signed out successfully.")
+        },
+        onError(context) {
+          toast.error(context.error.message)
         },
       },
     });

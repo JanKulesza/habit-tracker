@@ -25,9 +25,10 @@ export default function HomePageClient({ userName, entries: se, habits: sh }: Ho
     const [habits, setHabits] = useState(sh);
     const entriesThisWeek = formatEntriesByDate(entries, startOfWeek(new Date, { locale: pl })),
         entriesToday = entriesThisWeek[format(new Date, "yyyy-MM-dd")];
-
+    console.log(entries);
+    
     const progress = habits?.length ? Number(((entriesToday?.length ?? 0) * 100 / habits.length).toFixed()) : 0,
-        bestStreak = sort(entriesToday).desc(e => e.streak)?.[0]?.streak ?? 0,
+        bestStreak = sort(entries).desc(e => e.streak)?.[0]?.streak ?? 0,
         trendWeek = (() => {
             let sum = 0, sumOfHabits = 0;
             for (const key in entriesThisWeek) {
