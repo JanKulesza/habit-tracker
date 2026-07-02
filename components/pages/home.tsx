@@ -5,7 +5,7 @@ import InfoBox from '../info-box';
 import { ProgressU } from '../ui/progress-updated';
 import AddHabitBtn from '../add-habit-btn';
 import { formatEntriesByDate } from '@/lib/utils';
-import { endOfDay, endOfMonth, endOfWeek, format, startOfMonth, startOfWeek, subDays, subMonths, subWeeks } from 'date-fns';
+import { endOfWeek, format, startOfWeek, subDays, subWeeks } from 'date-fns';
 import { pl } from 'date-fns/locale';
 import { sort } from 'fast-sort';
 import { Target, Flame, Medal, TrendingUp } from 'lucide-react';
