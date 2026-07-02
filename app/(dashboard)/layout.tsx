@@ -1,11 +1,13 @@
 import AppSidebar from "@/components/app-sidebar";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
+import { requireSession } from "@/lib/dal/session";
 
 export default async function DashboardLayout({
     children,
 }: Readonly<{
     children: React.ReactNode;
 }>) {
+    await requireSession();
     return (
         <SidebarProvider>
             <AppSidebar />

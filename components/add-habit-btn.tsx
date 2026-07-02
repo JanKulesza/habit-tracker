@@ -11,7 +11,6 @@ import { useState } from 'react'
 import { Spinner } from './ui/spinner'
 import FormSelect from './inputs/form-select'
 import { Habit } from '@/generated/prisma/client'
-import { requireSession } from '@/lib/dal/session'
 import { toast } from 'sonner'
 
 interface AddHabitProps {

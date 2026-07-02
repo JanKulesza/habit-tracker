@@ -18,7 +18,7 @@ interface HabitBarProps {
 
 export default function HabitBar({ habit, entryId, streakYesterday, onResult, currentEntriesSnapshot }: HabitBarProps) {
     const [isPending, setIsPending] = useState(false)
-    const isChecked = !!entryId
+    const isChecked = !!entryId, streak = isChecked ? streakYesterday + 1 : streakYesterday;
 
     const handleCheck = async () => {
         const snapshot = [...currentEntriesSnapshot];
@@ -70,8 +70,8 @@ export default function HabitBar({ habit, entryId, streakYesterday, onResult, cu
                     </div>
                 </div>
                 <div className='flex gap-4 items-center h-full'>
-                    <div className={`${isChecked ? "bg-primary/10 text-primary" : "bg-muted text-muted-foreground"} rounded-xl flex items-center px-2 p-1 text-xs gap-2`}>
-                        <Flame className='size-4' /> {isChecked ? streakYesterday + 1 : streakYesterday}
+                    <div className={`flex text-xs font-medium items-center gap-1 rounded-xl py-1.5 px-3 ${isChecked ? "bg-primary/10 text-primary" : "bg-muted text-muted-foreground"}`}>
+                        <Flame className="size-3.5" /> {streak === 1 ? `${streak} days` : `${streak} days`}
                     </div>
                     <ChevronRight />
                 </div>
