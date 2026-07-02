@@ -90,7 +90,7 @@ export default function HomePageClient({ userName, entries: se, habits: sh }: Ho
                     
                 </p>
             </div>
-            <div className="grid grid-cols-1 lg:grid-cols-4 md:grid-cols-2 gap-4 w-full">
+            <div className="grid grid-cols-1 xl:grid-cols-4 lg:grid-cols-2 gap-4 w-full">
                 {infoBoxes.map((val, i) =>
                     <InfoBox
                         key={i}
@@ -102,8 +102,8 @@ export default function HomePageClient({ userName, entries: se, habits: sh }: Ho
                     />
                 )}
             </div>
-            <div className="flex flex-col md:flex-row gap-8">
-                <div className="w-full md:w-3/5 space-y-4 border rounded-lg p-6">
+            <div className="flex flex-col lg:flex-row gap-8">
+                <div className="w-full lg:w-3/5 space-y-4 border rounded-lg p-6">
                     <div className="flex justify-between items-center">
                         <h2 className="font-medium">Habits today</h2>
                         <Link href="/habits" className="text-primary text-sm">See all</Link>
@@ -121,7 +121,7 @@ export default function HomePageClient({ userName, entries: se, habits: sh }: Ho
                         />
                     })}
                 </div>
-                <div className='space-y-8 md:w-2/5'>
+                <div className='space-y-8 lg:w-2/5'>
                     <WeekTiles entriesThisWeek={entriesThisWeek} habitsNum={habits.length} habitId={null} />
                     <div className="w-full space-y-4 border rounded-lg p-6">
                         <div className="flex justify-between items-center">

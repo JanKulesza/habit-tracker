@@ -105,7 +105,7 @@ export default function WeekTiles(props: WeekTilesProps) {
                         <div
                             key={i}
                             aria-disabled={entry.ofr}
-                            className={cn("border flex flex-col w-12 gap-4 items-center rounded-lg p-2 pb-4 text-xs aria-disabled:opacity-60 aria-disabled:text-muted-foreground",
+                            className={cn("border flex flex-col min-w-12 flex-1 gap-4 items-center rounded-lg p-2 pb-4 text-xs aria-disabled:opacity-60 aria-disabled:text-muted-foreground",
                                 entry.checked && "bg-primary border-primary text-white",
                                 entry.day === format(new Date(), 'EEEEEE') && "outline-2 outline-primary outline-offset-2",
                                 habitId && !entry.ofr && "cursor-pointer"
