@@ -3,13 +3,12 @@ import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { cache } from 'react';
-
-export async function getSession() {
-    return auth.api.getSession({ headers: await headers() });
-}
+import { isRedirectError } from 'next/dist/client/components/redirect-error';
+import { isAPIError } from 'better-auth/api';
 
 export const requireSession = cache(async () => {
-    const session = await getSession();
-    if (!session) redirect("/login");
+    const session = await auth.api.getSession({ headers: await headers() });
+    if (!session)
+        redirect("/login");
     return session;
 });

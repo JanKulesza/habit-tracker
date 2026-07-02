@@ -87,10 +87,10 @@ export default function WeekTiles(props: WeekTilesProps) {
                 toast.success("Completed habit!")
             } else
                 toast.success("Unchecked habit.")
-            setIsPending(false);
         } catch (error) {
-            toast.error("An error occurred while updating the habit.");
+            toast.error("Network error. Please check your connection and try again.");
             onResult(snapshot);
+        } finally {
             setIsPending(false);
         }
     }

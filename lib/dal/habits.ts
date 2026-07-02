@@ -11,11 +11,16 @@ export const getHabitsForCurrentUser = cache(async (): Promise<ServerActionRespo
     'use server'
     const session = await requireSession();
 
-    return {
-        success: true, data: await prisma.habit.findMany({
-            where: { userId: session.user.id },
-        }) 
-    };
+    try {
+        return {
+            success: true, data: await prisma.habit.findMany({
+                where: { userId: session.user.id },
+            })
+        };
+    } catch (error) {
+        console.error("Error fetching habits:", error);
+        return { success: false, error: "Failed to fetch habits." }
+    }
 });
 
 export async function createHabit(formData: FormData): Promise<ServerActionResponse<Habit>> {
@@ -31,14 +36,18 @@ export async function createHabit(formData: FormData): Promise<ServerActionRespo
     if (!success)
         return { success: false, error: formatZodErrors(error) };
 
-
-    const habit = await prisma.habit.create({
-        data: {
-            name: data.name,
-            goal: data.goal,
-            icon: data.icon,
-            userId: user.id,
-        }
-    })
-    return { success: true, data: habit };
+    try {
+        const habit = await prisma.habit.create({
+            data: {
+                name: data.name,
+                goal: data.goal,
+                icon: data.icon,
+                userId: user.id,
+            }
+        })
+        return { success: true, data: habit };
+    } catch (error) {
+        console.error("Error creating habit:", error);
+        return { success: false, error: "Failed to create habit." }
+    }
 }

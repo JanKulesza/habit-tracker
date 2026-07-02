@@ -10,18 +10,23 @@ export const getEntriesForCurrentUser = cache(async (habitId?: Habit['id']): Pro
     'use server'
     const { user } = await requireSession()
 
-    return {
-        success: true, data: await prisma.entry.findMany({
-            where: {
-                habitId,
-                habit: {
-                    userId: user.id
+    try {
+        return {
+            success: true, data: await prisma.entry.findMany({
+                where: {
+                    habitId,
+                    habit: {
+                        userId: user.id
+                    },
                 },
-            },
-            orderBy: {
-                date: "asc"
-            }
-        })
+                orderBy: {
+                    date: "asc"
+                }
+            })
+        }
+    } catch (error) {
+        console.error("Error fetching entries:", error);
+        return { success: false, error: "Failed to fetch entries." }
     }
 })
 
@@ -32,45 +37,50 @@ export async function createEntry(habitId: Habit['id'], date: Date): Promise<Ser
     if (isAfter(date, new Date()))
         return { success: false, error: "Unable to create entry in future." }
 
-    const habit = await prisma.habit.findFirst({
-        where: {
-            userId: user.id,
-            id: habitId
+    try {
+        const habit = await prisma.habit.findFirst({
+            where: {
+                userId: user.id,
+                id: habitId
+            }
+        })
+
+        if (!habit) {
+            return { success: false, error: "Habit not found" }
         }
-    })
 
-    if (!habit) {
-        return { success: false, error: "Habit not found" }
-    }
+        const existingEntry = await prisma.entry.findFirst({
+            where: {
+                date: format(date, 'yyyy-MM-dd'),
+                habitId
+            }
+        });
 
-    const existingEntry = await prisma.entry.findFirst({
-        where: {
-            date: format(date, 'yyyy-MM-dd'),
-            habitId
+        if (existingEntry) {
+            return { success: false, error: "Entry already exists for this date" }
         }
-    });
 
-    if (existingEntry) {
-        return { success: false, error: "Entry already exists for this date" }
-    }
+        const entryDayBefore = await prisma.entry.findFirst({
+            where: {
+                habitId,
+                date: format(subDays(date, 1), 'yyyy-MM-dd')
+            }
+        });
 
-    const entryDayBefore = await prisma.entry.findFirst({
-        where: {
-            habitId,
-            date: format(subDays(date, 1), 'yyyy-MM-dd')
+        const entry = await prisma.entry.create({
+            data: {
+                habitId,
+                date: format(date, 'yyyy-MM-dd'),
+                streak: entryDayBefore ? entryDayBefore.streak + 1 : 1
+            }
+        });
+
+        return {
+            success: true, data: entry
         }
-    });
-
-    const entry = await prisma.entry.create({
-        data: {
-            habitId,
-            date: format(date, 'yyyy-MM-dd'),
-            streak: entryDayBefore ? entryDayBefore.streak + 1 : 1
-        }
-    });
-
-    return {
-        success: true, data: entry
+    } catch (error) {
+        console.error("Error creating entry:", error);
+        return { success: false, error: "Failed to create entry." }
     }
 }
 
@@ -78,40 +88,45 @@ export async function deleteEntry(entryId: Entry['id']): Promise<ServerActionRes
     'use server'
     const { user } = await requireSession()
 
-    const entry = await prisma.entry.findFirst({
-        where: {
-            id: entryId,
-            habit: {
-                userId: user.id
-            }
-        }
-    })
-
-    if (!entry) {
-        return { success: false, error: "Entry not found" }
-    }
-
-    const deletedEntry = await prisma.entry.delete({
-        where: {
-            id: entryId
-        }
-    });
-    if (isBefore(deletedEntry.date, format(new Date(), 'yyyy-MM-dd'))) {
-        await prisma.entry.updateMany({
+    try {
+        const entry = await prisma.entry.findFirst({
             where: {
-                habitId: deletedEntry.habitId,
-                date: {
-                    gt: format(deletedEntry.date, 'yyyy-MM-dd')
+                id: entryId,
+                habit: {
+                    userId: user.id
                 }
-            },
-            data: {
-                streak: { decrement: 1 }
+            }
+        })
+
+        if (!entry) {
+            return { success: false, error: "Entry not found" }
+        }
+
+        const deletedEntry = await prisma.entry.delete({
+            where: {
+                id: entryId
             }
         });
-    }
+        if (isBefore(deletedEntry.date, format(new Date(), 'yyyy-MM-dd'))) {
+            await prisma.entry.updateMany({
+                where: {
+                    habitId: deletedEntry.habitId,
+                    date: {
+                        gt: format(deletedEntry.date, 'yyyy-MM-dd')
+                    }
+                },
+                data: {
+                    streak: { decrement: 1 }
+                }
+            });
+        }
 
-    return {
-        success: true, data: null
+        return {
+            success: true, data: null
+        }
+    } catch (error) {
+        console.error("Error deleting entry:", error);
+        return { success: false, error: "Failed to delete entry." }
     }
 }
 
@@ -122,6 +137,9 @@ export async function switchEntry(habitId: Habit['id'], date: Date): Promise<Ser
     const entry = await prisma.entry.findFirst({
         where: {
             habitId,
+            habit: {
+                userId: user.id
+            },
             date: format(date, 'yyyy-MM-dd')
         }
     })

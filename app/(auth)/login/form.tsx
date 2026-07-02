@@ -3,16 +3,13 @@ import { FormCheckBox } from '@/components/inputs/form-checkbox';
 import FormInput from '@/components/inputs/form-input';
 import { Button } from '@/components/ui/button';
 import { FieldGroup } from '@/components/ui/field';
-import { authClient } from '@/lib/auth-client';
+import { credentialsLogin } from '@/lib/auth-client';
 import { LoginSchema, loginSchema } from '@/lib/validations';
 import { zodResolver } from '@hookform/resolvers/zod';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
 import { useForm, FormProvider } from 'react-hook-form';
-import { toast } from 'sonner';
 
 export default function LoginForm() {
-    const router = useRouter();
     const form = useForm<LoginSchema>({
         resolver: zodResolver(loginSchema),
         defaultValues: {
@@ -22,20 +19,9 @@ export default function LoginForm() {
         }
     })
 
-    const onSubmit = async (values: LoginSchema) => {
-        const { error } = await authClient.signIn.email({
-            ...values
-        });
-        if (error)
-            toast.error(error.message)
-        else {
-            router.push("/");
-            toast.success("Logged in successfully.")
-        }
-    }
     return (
         <FormProvider {...form}>
-            <form id="login-form" onSubmit={form.handleSubmit(onSubmit)}>
+            <form id="login-form" onSubmit={form.handleSubmit(credentialsLogin)}>
                 <FieldGroup>
                     <FormInput label="Email" placeholder="johnsmith@example.com" name="email" />
                     <FormInput label="Password" name="password" type="password" placeholder="pAssword123_" />

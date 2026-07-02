@@ -19,7 +19,7 @@ interface AddHabitProps {
     onResult: (result: Habit[]) => void
 }
 
-export default function AddHabitBtn({currentHabitsSnapshot, onResult} : AddHabitProps) {
+export default function AddHabitBtn({ currentHabitsSnapshot, onResult }: AddHabitProps) {
     const [open, setOpen] = useState(false);
     const form = useForm<HabitsSchema>({
         resolver: zodResolver(habitsSchema),
@@ -33,25 +33,32 @@ export default function AddHabitBtn({currentHabitsSnapshot, onResult} : AddHabit
     const iconOptions = Object.values(Icon).map(val => ({ label: val, value: val }));
 
     const onSubmit = async (values: HabitsSchema) => {
-        const {name,goal,icon} = values
+        const { name, goal, icon } = values
         const formData = new FormData();
         formData.append('name', name);
         formData.append('goal', goal);
         formData.append('icon', icon);
 
         const snapshot = [...currentHabitsSnapshot];
-        onResult([...currentHabitsSnapshot, {name,goal,icon,frequency:"daily", id:-1, userId: "mock"}])
+        onResult([...currentHabitsSnapshot, { name, goal, icon, frequency: "daily", id: -1, userId: "mock" }])
         setOpen(false)
-        const res = await createHabit(formData);
-        if (!res.success) {
-            toast.error(res.error);
+        try {
+            const res = await createHabit(formData);
+
+            if (!res.success) {
+                toast.error(res.error);
+                onResult(snapshot);
+                setOpen(true);
+                return;
+            }
+            toast.success("Habit created successfully!")
+            onResult([...snapshot, res.data])
+            form.reset();
+        } catch (error) {
+            toast.error("Network error. Please check your connection and try again.");
             onResult(snapshot);
             setOpen(true);
-            return;
         }
-        toast.success("Habit created successfully!")
-        onResult([...snapshot, res.data])
-        form.reset();
     }
     return (
         <Dialog open={open} onOpenChange={setOpen}>
