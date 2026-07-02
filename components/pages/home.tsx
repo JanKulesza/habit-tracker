@@ -25,7 +25,6 @@ export default function HomePageClient({ userName, entries: se, habits: sh }: Ho
     const [habits, setHabits] = useState(sh);
     const entriesThisWeek = formatEntriesByDate(entries, startOfWeek(new Date, { locale: pl })),
         entriesToday = entriesThisWeek[format(new Date, "yyyy-MM-dd")];
-    console.log(entries);
     
     const progress = habits?.length ? Number(((entriesToday?.length ?? 0) * 100 / habits.length).toFixed()) : 0,
         bestStreak = sort(entries).desc(e => e.streak)?.[0]?.streak ?? 0,
@@ -80,11 +79,15 @@ export default function HomePageClient({ userName, entries: se, habits: sh }: Ho
             <div className="w-full space-y-4 border rounded-lg p-6">
                 <div className="flex justify-between items-center">
                     <h2 className="font-medium">Progress for today</h2>
-                    <p className="text-muted-foreground text-sm">{entriesToday?.length ? entriesToday.length : "0"}/{habits?.length ? habits.length : "0"} completed</p>
+                    <p className="text-muted-foreground text-sm">{entriesToday.length}/{habits?.length} completed</p>
                 </div>
                 <ProgressU value={progress} max={100} />
                 <p className="text-sm text-muted-foreground">
-                    {progress}% of the day is behind you - keep it up!
+                    {progress !== 100 
+                    ? `${progress}% of the day is behind you - keep it up!`
+                    : "🎉 Congratulations! All today's habits are completed."
+                    }
+                    
                 </p>
             </div>
             <div className="grid grid-cols-1 lg:grid-cols-4 md:grid-cols-2 gap-4 w-full">

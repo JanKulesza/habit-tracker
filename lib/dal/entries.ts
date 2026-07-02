@@ -6,7 +6,7 @@ import { Entry, Habit } from "@/generated/prisma/browser"
 import { format, isAfter, isBefore, subDays } from "date-fns"
 import { cache } from "react"
 
-export const getEntriesForCurrentUser = cache(async (timeframe: { start?: Date; end?: Date }, habitId?: Habit['id']): Promise<ServerActionResponse<Entry[]>> => {
+export const getEntriesForCurrentUser = cache(async (habitId?: Habit['id']): Promise<ServerActionResponse<Entry[]>> => {
     'use server'
     const { user } = await requireSession()
 
@@ -17,9 +17,6 @@ export const getEntriesForCurrentUser = cache(async (timeframe: { start?: Date; 
                 habit: {
                     userId: user.id
                 },
-                date: {
-                    in: [format(timeframe?.start ?? user.createdAt, 'yyyy-MM-dd'), format(timeframe?.end ?? new Date(), 'yyyy-MM-dd')]
-                }
             },
             orderBy: {
                 date: "asc"
@@ -32,8 +29,8 @@ export async function createEntry(habitId: Habit['id'], date: Date): Promise<Ser
     'use server'
     const { user } = await requireSession()
 
-    if(isAfter(date,new Date()))
-        return {success:false, error: "Unable to create entry in future."}
+    if (isAfter(date, new Date()))
+        return { success: false, error: "Unable to create entry in future." }
 
     const habit = await prisma.habit.findFirst({
         where: {
@@ -60,9 +57,7 @@ export async function createEntry(habitId: Habit['id'], date: Date): Promise<Ser
     const entryDayBefore = await prisma.entry.findFirst({
         where: {
             habitId,
-            date: {
-                lt: format(subDays(date, 1), 'yyyy-MM-dd')
-            }
+            date: format(subDays(date, 1), 'yyyy-MM-dd')
         }
     });
 
@@ -131,8 +126,8 @@ export async function switchEntry(habitId: Habit['id'], date: Date): Promise<Ser
         }
     })
 
-    if (!entry) 
-        return createEntry(habitId,date);
+    if (!entry)
+        return createEntry(habitId, date);
 
     return deleteEntry(entry.id)
 }

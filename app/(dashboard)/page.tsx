@@ -3,13 +3,14 @@ import { getHabitsForCurrentUser } from "@/lib/dal/habits";
 import { requireSession } from "@/lib/dal/session";
 
 import HomePageClient from "@/components/pages/home";
+import { toast } from "sonner";
 
 export default async function Home() {
   const { user } = await requireSession();
   const resHab = await getHabitsForCurrentUser();
-  const resEntr = await getEntriesForCurrentUser({})
+  const resEntr = await getEntriesForCurrentUser()
   if (!resHab.success || !resEntr.success)
-    return console.log("Error while loading resources.");
+    return toast.error("Error while loading resources.");
 
-  return <HomePageClient userName={user.name} entries={resEntr.data} habits={resHab.data} />
+  return <HomePageClient userName={user.name} entries={resEntr.data ?? []} habits={resHab.data ?? []} />
 }
