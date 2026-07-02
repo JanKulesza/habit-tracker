@@ -34,13 +34,14 @@ export default function WeekTiles(props: WeekTilesProps) {
     }[] = [];
 
     for (let i = startOfWeek(new Date(), { locale: pl }); isBefore(i, endOfWeek(new Date(), { locale: pl })); i = addDays(i, 1)) {
-        if (entriesThisWeek[format(i, 'yyyy-MM-dd')])
+        const entriesThisDay = entriesThisWeek[format(i, 'yyyy-MM-dd')]
+        if (entriesThisDay && entriesThisDay.length > 0)
             entriesArr.push({
                 date: i,
                 day: format(i, 'EEEEEE'),
                 checked: !habitId
-                    ? entriesThisWeek[format(i, 'yyyy-MM-dd')].length === habitsNum
-                    : entriesThisWeek[format(i, 'yyyy-MM-dd')].some(val => val.habitId === habitId),
+                    ? entriesThisDay.length === habitsNum
+                    : entriesThisDay.some(val => val.habitId === habitId),
                 ofr: false
             })
         else
@@ -48,7 +49,7 @@ export default function WeekTiles(props: WeekTilesProps) {
                 date: i,
                 day: format(i, 'EEEEEE'),
                 checked: false,
-                ofr: true
+                ofr: !entriesThisDay
             })
     }
 

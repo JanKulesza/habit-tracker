@@ -21,11 +21,12 @@ export default function HeatMap({ startDate, endDate, entries, habitsNum }: Heat
     }[] = [];
 
     for (let i = startDate; isBefore(i, endDate); i = addDays(i, 1)) {
-        if (entriesInPeriod[format(i, 'yyyy-MM-dd')])
+        const entriesThisDay = entriesInPeriod[format(i, 'yyyy-MM-dd')]
+        if (entriesThisDay && entriesThisDay.length > 0)
             entriesArr.push({
                 date: i,
                 checked: habitsNum > 1
-                    ? entriesInPeriod[format(i, 'yyyy-MM-dd')].length === habitsNum
+                    ? entriesThisDay.length === habitsNum
                     : true,
             })
         else
