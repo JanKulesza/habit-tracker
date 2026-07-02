@@ -37,7 +37,7 @@ export default function HeatMap({ startDate, endDate, entries, habitsNum }: Heat
 
     return (
         <div className='flex'>
-            <div className="flex flex-col justify-evenly text-xs mr-2 text-muted-foreground">
+            <div className="flex flex-col justify-evenly text-xs mr-2 my-4 text-muted-foreground">
                 <span>Tue</span>
                 <span>Thu</span>
                 <span>Sat</span>

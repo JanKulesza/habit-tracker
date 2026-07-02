@@ -116,9 +116,7 @@ export default function HomePageClient({ userName, entries: se, habits: sh }: Ho
                             habit={hab}
                             entryId={entryId}
                             streakYesterday={streakYesterday}
-                            onResult={(result: Entry[]) => {
-                                setEntries(result)
-                            }}
+                            onResult={setEntries}
                             currentEntriesSnapshot={entries}
                         />
                     })}

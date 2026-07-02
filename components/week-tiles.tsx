@@ -5,7 +5,7 @@ import { cn } from "@/lib/utils";
 import { addDays, endOfWeek, format, isBefore, startOfWeek } from "date-fns";
 import { pl } from "date-fns/locale";
 import { Check, X } from "lucide-react";
-import { useState } from "react";
+import { Dispatch, SetStateAction, useState } from "react";
 import { ScrollArea, ScrollBar } from "./ui/scroll-area";
 import { toast } from "sonner";
 
@@ -20,7 +20,7 @@ type WeekTilesProps =
         habitsNum: number
         habitId: Habit['id']
         streakYesterday: number
-        onResult: (result: Entry[]) => void
+        onResult: Dispatch<SetStateAction<Entry[]>>
         currentEntriesSnapshot: Entry[]
     };
 
@@ -73,17 +73,26 @@ export default function WeekTiles(props: WeekTilesProps) {
             }])
 
         setIsPending(true);
-        const res = await switchEntry(habitId, date)
-        if (!res?.success) {
-            toast.error(res.error);
-            onResult(snapshot)
-        } else if (res.data){
-            onResult([...snapshot, res.data])
-            toast.success("Completed habit!")
-        } else 
-            toast.success("Unchecked habit.")
+         try {
+            const res = await switchEntry(habitId, date);
 
-        setIsPending(false);
+            if (!res?.success) {
+                toast.error(res.error);
+                onResult(snapshot)
+            } else if (res.data) {
+                onResult(prevEntries => {
+                    const filtered = prevEntries.filter(e => e.habitId !== habitId);
+                    return [...filtered, res.data!];
+                });
+                toast.success("Completed habit!")
+            } else
+                toast.success("Unchecked habit.")
+            setIsPending(false);
+        } catch (error) {
+            toast.error("An error occurred while updating the habit.");
+            onResult(snapshot);
+            setIsPending(false);
+        }
     }
 
     return (

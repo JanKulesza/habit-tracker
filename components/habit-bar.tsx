@@ -5,14 +5,14 @@ import { createEntry, deleteEntry, switchEntry } from '@/lib/dal/entries'
 import { format } from 'date-fns'
 import { ChevronRight, Flame } from 'lucide-react'
 import Link from 'next/link'
-import { useState } from 'react'
+import { Dispatch, SetStateAction, useState } from 'react'
 import { toast } from 'sonner'
 
 interface HabitBarProps {
     entryId: number | null
     streakYesterday: number,
     habit: Habit,
-    onResult: (result: Entry[]) => void
+    onResult: Dispatch<SetStateAction<Entry[]>>
     currentEntriesSnapshot: Entry[]
 }
 
@@ -24,9 +24,10 @@ export default function HabitBar({ habit, entryId, streakYesterday, onResult, cu
         const snapshot = [...currentEntriesSnapshot];
         if (isPending || habit.id === -1)
             return
+        console.log(habit.name, currentEntriesSnapshot);
 
         if (isChecked)
-            onResult(currentEntriesSnapshot.filter(e => e.id !== entryId));
+            onResult(currentEntriesSnapshot.filter(e => e.id !== entryId && e.habitId !== habit.id));
         else
             onResult([...currentEntriesSnapshot, {
                 id: -1,
@@ -36,18 +37,26 @@ export default function HabitBar({ habit, entryId, streakYesterday, onResult, cu
             }])
         setIsPending(true);
 
-        const res = await switchEntry(habit.id, new Date());
+        try {
+            const res = await switchEntry(habit.id, new Date());
 
-        if (!res?.success) {
-            toast.error(res.error);
-            onResult(snapshot)
-        } else if (res.data){
-            onResult([...snapshot, res.data])
-            toast.success("Completed habit!")
-        } else 
-            toast.success("Unchecked habit.")
-        setIsPending(false);
-
+            if (!res?.success) {
+                toast.error(res.error);
+                onResult(snapshot)
+            } else if (res.data) {
+                onResult(prevEntries => {
+                    const filtered = prevEntries.filter(e => e.habitId !== habit.id);
+                    return [...filtered, res.data!];
+                });
+                toast.success("Completed habit!")
+            } else
+                toast.success("Unchecked habit.")
+            setIsPending(false);
+        } catch (error) {
+            toast.error("An error occurred while updating the habit.");
+            onResult(snapshot);
+            setIsPending(false);
+        }
     }
     return (
         <div className='flex py-4 items-center border-b gap-4'>
