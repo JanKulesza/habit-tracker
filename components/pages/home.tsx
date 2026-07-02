@@ -26,13 +26,13 @@ export default function HomePageClient({ userName, entries: se, habits: sh }: Ho
     const entriesThisWeek = formatEntriesByDate(entries, startOfWeek(new Date, { locale: pl })),
         entriesToday = entriesThisWeek[format(new Date, "yyyy-MM-dd")];
     
-    const progress = habits?.length ? Number(((entriesToday?.length ?? 0) * 100 / habits.length).toFixed()) : 0,
+    const progress = habits.length > 0 ? Number(((entriesToday.length ?? 0) * 100 / habits.length).toFixed()) : 0,
         bestStreak = sort(entries).desc(e => e.streak)?.[0]?.streak ?? 0,
         trendWeek = (() => {
             let sum = 0, sumOfHabits = 0;
             for (const key in entriesThisWeek) {
                 sum += entriesThisWeek[key].length ?? 0;
-                sumOfHabits += habits?.length ?? 0
+                sumOfHabits += habits.length
             }
             return sumOfHabits > 0 ? (sum * 100 / sumOfHabits).toFixed() : 0.00
         })()
@@ -42,13 +42,13 @@ export default function HomePageClient({ userName, entries: se, habits: sh }: Ho
             icon: Target,
             iconColor: "text-[#6ec58e]",
             text: `${progress}%`,
-            description: `${entriesToday?.length ?? "0"} out of ${habits?.length ?? 0} habits`
+            description: `${entriesToday.length} out of ${habits.length} habits`
         },
         {
             title: "Active streaks",
             icon: Flame,
             iconColor: "text-[#fa914a]",
-            text: `${entriesToday?.filter(val => val.streak > 0).length ?? 0}`,
+            text: `${entriesToday.filter(val => val.streak > 0).length ?? 0}`,
             description: "running streaks",
         },
         {
@@ -79,7 +79,7 @@ export default function HomePageClient({ userName, entries: se, habits: sh }: Ho
             <div className="w-full space-y-4 border rounded-lg p-6">
                 <div className="flex justify-between items-center">
                     <h2 className="font-medium">Progress for today</h2>
-                    <p className="text-muted-foreground text-sm">{entriesToday.length}/{habits?.length} completed</p>
+                    <p className="text-muted-foreground text-sm">{entriesToday.length}/{habits.length} completed</p>
                 </div>
                 <ProgressU value={progress} max={100} />
                 <p className="text-sm text-muted-foreground">
