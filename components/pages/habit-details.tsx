@@ -3,12 +3,13 @@ import { Entry, Habit } from "@/generated/prisma/client"
 import { Icon, ICON_COLORS } from "@/lib/validations";
 import { useState } from "react";
 import { Button } from "../ui/button";
-import { format, startOfWeek, subDays } from "date-fns";
+import { format, startOfDay, startOfWeek, subDays } from "date-fns";
 import { formatEntriesByDate } from "@/lib/utils";
 import { pl } from "date-fns/locale";
-import { Calendar, Check, Edit, Target, Trash2 } from "lucide-react";
+import { Calendar, Check, Edit, Flame, Medal, Target, Trash2 } from "lucide-react";
 import { useHandleCheck } from "@/lib/hooks/use-handle-check";
 import WeekTiles from "../week-tiles";
+import InfoBox from "../info-box";
 
 interface HabitDetailsClientPageProps {
     habit: Habit
@@ -17,7 +18,7 @@ interface HabitDetailsClientPageProps {
 
 export default function HabitDetailsClientPage({ habit: h, habitEntries }: HabitDetailsClientPageProps) {
     const [habit, setHabit] = useState(h);
-    const [entries, setEntries] = useState(habitEntries);
+    const [entries, setEntries] = useState(habitEntries); // Entries for this habit only
     const date = new Date(),
         entriesThisWeek = formatEntriesByDate(entries, startOfWeek(date, { locale: pl })),
         entryId = entriesThisWeek[format(date, 'yyyy-MM-dd')]?.[0]?.id ?? null,
@@ -25,6 +26,52 @@ export default function HabitDetailsClientPage({ habit: h, habitEntries }: Habit
         rgbColor = ICON_COLORS[habit.icon as Icon] ?? ICON_COLORS["default"];
 
     const { isPending, isChecked, handleCheck } = useHandleCheck(entries, setEntries, habit.id, entryId, streakYesterday);
+
+    const last30DaysPercent = (() => {
+        let daysDone = 0;
+
+        for (let i = 0; i < 30; i++) {
+            if (entries.some(
+                e => e.habitId === habit.id && e.date === format(subDays(startOfDay(date), i), 'yyyy-MM-dd')
+            ))
+                daysDone++;
+        }
+
+        return (daysDone * 100) / 30;
+    })().toFixed(0),
+        bestStreak = entries.reduce((acc, curr) => curr.streak > acc ? curr.streak : acc, 0);
+
+    const infoBoxes = [
+        {
+            title: "Current streak",
+            icon: Flame,
+            iconColor: "text-[#fa914a]",
+            text: `${entriesThisWeek[format(date, 'yyyy-MM-dd')]?.[0]?.streak ?? 0}`,
+            description: "runs nonstop",
+        },
+        {
+            title: "Best streak",
+            icon: Medal,
+            iconColor: "text-[#a176f1]",
+            text: `${bestStreak} ${bestStreak === 1 ? "day" : "days"}`,
+            description: `All-time record`
+        },
+        {
+            title: "30 days",
+            icon: Target,
+            iconColor: "text-[#6ec58e]",
+            text: `${last30DaysPercent}%`,
+            description: "Completion rate"
+        },
+        {
+            title: "All-together",
+            icon: Check,
+            iconColor: "text-[#4cbaed]",
+            text: `${entries.length}%`,
+            description: "Total completions"
+        },
+
+    ]
     return (
         <>
             <div className="flex justify-between items-center">
@@ -52,6 +99,18 @@ export default function HabitDetailsClientPage({ habit: h, habitEntries }: Habit
                     <Button variant="outline" className="font-normal p-5"><Edit /></Button>
                     <Button variant="destructive" className="font-normal p-5"><Trash2 /></Button>
                 </div>
+            </div>
+            <div className="grid grid-cols-1 xl:grid-cols-4 lg:grid-cols-2 gap-4 w-full">
+                {infoBoxes.map((val, i) =>
+                    <InfoBox
+                        key={i}
+                        Icon={val.icon}
+                        description={val.description}
+                        text={val.text}
+                        title={val.title}
+                        iconColor={val.iconColor}
+                    />
+                )}
             </div>
             <WeekTiles
                 currentEntriesSnapshot={entries}
