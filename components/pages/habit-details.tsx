@@ -6,12 +6,13 @@ import { Button } from "../ui/button";
 import { format, startOfDay, startOfWeek, subDays, subYears } from "date-fns";
 import { formatEntriesByDate } from "@/lib/utils";
 import { pl } from "date-fns/locale";
-import { Calendar, Check, Edit, Flame, Medal, Target, Trash2 } from "lucide-react";
+import { Calendar, Check, Edit, Flame, Medal, Target } from "lucide-react";
 import { useHandleCheck } from "@/lib/hooks/use-handle-check";
 import WeekTiles from "../week-tiles";
 import InfoBox from "../info-box";
 import HeatMap from "../heat-map";
 import UpsertHabitBtn from "../upsert-habit-btn";
+import DeleteHabitBtn from "../delete-habit-btn";
 
 interface HabitDetailsClientPageProps {
     habit: Habit
@@ -101,7 +102,7 @@ export default function HabitDetailsClientPage({ habit: h, habitEntries }: Habit
                     <UpsertHabitBtn habit={habit} onResult={setHabit}>
                         <Button variant="outline" className="font-normal p-5"><Edit /></Button>
                     </UpsertHabitBtn>
-                    <Button variant="destructive" className="font-normal p-5"><Trash2 /></Button>
+                    <DeleteHabitBtn habitId={habit.id} />
                 </div>
             </div>
             <div className="grid grid-cols-1 xl:grid-cols-4 lg:grid-cols-2 gap-4 w-full">

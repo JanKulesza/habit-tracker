@@ -72,7 +72,7 @@ export async function createHabit(formData: FormData): Promise<ServerActionRespo
 
 export async function updateHabit(habitId: Habit['id'], formData: FormData): Promise<ServerActionResponse<Habit>> {
     'use server'
-    const { user } = await requireSession();
+    await requireSession();
     try {
 
         const existingHabit = await prisma.habit.findUnique({
@@ -96,10 +96,32 @@ export async function updateHabit(habitId: Habit['id'], formData: FormData): Pro
             },
             data: {
                 ...data,
-                userId: user.id,
             }
         })
         return { success: true, data: habit };
+    } catch (error) {
+        console.error("Error creating habit:", error);
+        return { success: false, error: "Failed to create habit." }
+    }
+}
+
+export async function deleteHabit(habitId: Habit['id']): Promise<ServerActionResponse<null>> {
+    'use server'
+    await requireSession();
+    try {
+
+        const existingHabit = await prisma.habit.findUnique({
+            where: { id: habitId },
+        });
+        if (!existingHabit)
+            return { success: false, error: "Habit not found." }
+
+        await prisma.habit.delete({
+            where: {
+                id: habitId
+            },
+        })
+        return { success: true, data: null };
     } catch (error) {
         console.error("Error creating habit:", error);
         return { success: false, error: "Failed to create habit." }
