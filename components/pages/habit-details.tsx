@@ -3,12 +3,11 @@ import { Entry, Habit } from "@/generated/prisma/client"
 import { Icon, ICON_COLORS } from "@/lib/validations";
 import { useState } from "react";
 import { Button } from "../ui/button";
-import { toast } from "sonner";
 import { format, startOfWeek, subDays } from "date-fns";
 import { formatEntriesByDate } from "@/lib/utils";
 import { pl } from "date-fns/locale";
-import { switchEntry } from "@/lib/dal/entries";
-import { Calendar, Check, Edit, Target, Trash, Trash2 } from "lucide-react";
+import { Calendar, Check, Edit, Target, Trash2 } from "lucide-react";
+import { useHandleCheck } from "@/lib/hooks/use-handle-check";
 
 interface HabitDetailsClientPageProps {
     habit: Habit
@@ -18,52 +17,13 @@ interface HabitDetailsClientPageProps {
 export default function HabitDetailsClientPage({ habit: h, habitEntries }: HabitDetailsClientPageProps) {
     const [habit, setHabit] = useState(h);
     const [entries, setEntries] = useState(habitEntries);
-    const [isPending, setIsPending] = useState(false)
     const date = new Date(),
         entriesThisWeek = formatEntriesByDate(entries, startOfWeek(date, { locale: pl })),
         entryId = entriesThisWeek[format(date, 'yyyy-MM-dd')]?.[0]?.id ?? null,
         streakYesterday = entriesThisWeek[format(subDays(date, 1), 'yyyy-MM-dd')]?.[0]?.streak ?? 0,
-        isChecked = !!entryId;
-    const rgbColor = ICON_COLORS[habit.icon as Icon] ?? ICON_COLORS["default"];
+        rgbColor = ICON_COLORS[habit.icon as Icon] ?? ICON_COLORS["default"];
 
-    const handleCheck = async () => {
-        const snapshot = [...entries];
-        if (isPending || habit.id === -1)
-            return
-
-        const mockId = date.getUTCMilliseconds()
-        if (isChecked)
-            setEntries(entries.filter(e => e.id !== entryId));
-        else
-            setEntries([...entries, {
-                id: mockId,
-                date: format(date, 'yyyy-MM-dd'),
-                habitId: habit.id,
-                streak: streakYesterday + 1
-            }])
-        setIsPending(true);
-
-        try {
-            const res = await switchEntry(habit.id, date);
-
-            if (!res?.success) {
-                toast.error(res.error);
-                setEntries(snapshot)
-            } else if (res.data) {
-                setEntries(prevEntries => {
-                    const filtered = prevEntries.filter(e => e.id !== mockId);
-                    return [...filtered, res.data!];
-                });
-                toast.success("Completed habit!")
-            } else
-                toast.success("Unchecked habit.")
-        } catch (error) {
-            toast.error("Network error. Please check your connection and try again.");
-            setEntries(snapshot);
-        } finally {
-            setIsPending(false);
-        }
-    }
+    const { isPending, isChecked, handleCheck } = useHandleCheck(entries, setEntries, habit.id, entryId, streakYesterday);
     return (
         <>
             <div className="flex justify-between items-center">

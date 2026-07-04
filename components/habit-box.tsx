@@ -3,14 +3,13 @@
 import { Entry, Habit } from "@/generated/prisma/client"
 import Link from "next/link"
 import { Checkbox } from "./ui/checkbox"
-import { switchEntry } from "@/lib/dal/entries"
 import { Dispatch, SetStateAction, useState } from "react"
-import { toast } from "sonner"
 import { addDays, endOfWeek, format, isBefore, startOfDay, startOfWeek, subDays } from "date-fns"
 import { Icon, ICON_COLORS } from "@/lib/validations"
 import { pl } from "date-fns/locale"
 import { Flame } from "lucide-react"
 import { Separator } from "./ui/separator"
+import { useHandleCheck } from "@/lib/hooks/use-handle-check"
 
 interface HabitBoxProps {
     habit: Habit
@@ -21,11 +20,10 @@ interface HabitBoxProps {
 }
 
 export default function HabitBox({ habit, entryId, streakYesterday, currentEntriesSnapshot, onResult }: HabitBoxProps) {
-    const [isPending, setIsPending] = useState(false)
-    const isChecked = !!entryId,
-        streak = isChecked ? streakYesterday + 1 : streakYesterday,
-        date = new Date();
-    const rgbColor = ICON_COLORS[habit.icon as Icon] ?? ICON_COLORS["default"];
+    const { isPending, isChecked, handleCheck } = useHandleCheck(currentEntriesSnapshot, onResult, habit.id, entryId, streakYesterday);
+    const streak = isChecked ? streakYesterday + 1 : streakYesterday,
+        date = new Date(),
+        rgbColor = ICON_COLORS[habit.icon as Icon] ?? ICON_COLORS["default"];
 
     let entriesArr: {
         day: string,
@@ -48,44 +46,6 @@ export default function HabitBox({ habit, entryId, streakYesterday, currentEntri
         return (daysDone * 100) / 30;
     })().toFixed(0);
 
-    const handleCheck = async () => {
-        const snapshot = [...currentEntriesSnapshot];
-        if (isPending || habit.id === -1)
-            return
-
-        const mockId = date.getUTCMilliseconds()
-        if (isChecked)
-            onResult(currentEntriesSnapshot.filter(e => e.id !== entryId));
-        else
-            onResult([...currentEntriesSnapshot, {
-                id: mockId,
-                date: format(date, 'yyyy-MM-dd'),
-                habitId: habit.id,
-                streak: streakYesterday + 1
-            }])
-        setIsPending(true);
-
-        try {
-            const res = await switchEntry(habit.id, date);
-
-            if (!res?.success) {
-                toast.error(res.error);
-                onResult(snapshot)
-            } else if (res.data) {
-                onResult(prevEntries => {
-                    const filtered = prevEntries.filter(e => e.id !== mockId);
-                    return [...filtered, res.data!];
-                });
-                toast.success("Completed habit!")
-            } else
-                toast.success("Unchecked habit.")
-        } catch (error) {
-            toast.error("Network error. Please check your connection and try again.");
-            onResult(snapshot);
-        } finally {
-            setIsPending(false);
-        }
-    }
     return (
         <Link href={`/habits/${habit.id}`} className="rounded-lg border hover:border-primary p-6 space-y-6">
             <div className="flex justify-between items-center">
@@ -99,11 +59,16 @@ export default function HabitBox({ habit, entryId, streakYesterday, currentEntri
                         <span className="text-xs text-muted-foreground">{habit.frequency}</span>
                     </div>
                 </div>
-                <Checkbox onClick={(e) => {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    handleCheck();
-                }} checked={isChecked} className="rounded-xl size-7 cursor-pointer" />
+                <Checkbox
+                    onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        handleCheck();
+                    }}
+                    checked={isChecked}
+                    className="rounded-xl size-7 cursor-pointer"
+                    disabled={isPending}
+                />
             </div>
             <div className="flex justify-between gap-2">
                 {entriesArr.map((entry, i) =>
