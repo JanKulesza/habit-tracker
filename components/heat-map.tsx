@@ -38,13 +38,13 @@ export default function HeatMap({ startDate, endDate, entries, habitsNum }: Heat
 
     return (
         <div className='flex'>
-            <div className="flex flex-col justify-evenly text-xs mr-2 my-4 text-muted-foreground">
+            <div className="flex flex-col justify-evenly text-xs mr-2 my-4 mt-6 text-muted-foreground">
                 <span>Tue</span>
                 <span>Thu</span>
                 <span>Sat</span>
             </div>
             <ScrollArea className='w-full overflow-x-auto'>
-                <div className='flex gap-1'>
+                <div className='flex gap-1 mb-2'>
                     {entriesArr.map((_, idx) => {
                         if(idx % 7 !== 0)
                             return

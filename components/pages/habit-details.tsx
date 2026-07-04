@@ -3,13 +3,14 @@ import { Entry, Habit } from "@/generated/prisma/client"
 import { Icon, ICON_COLORS } from "@/lib/validations";
 import { useState } from "react";
 import { Button } from "../ui/button";
-import { format, startOfDay, startOfWeek, subDays } from "date-fns";
+import { format, startOfDay, startOfWeek, subDays, subYears } from "date-fns";
 import { formatEntriesByDate } from "@/lib/utils";
 import { pl } from "date-fns/locale";
 import { Calendar, Check, Edit, Flame, Medal, Target, Trash2 } from "lucide-react";
 import { useHandleCheck } from "@/lib/hooks/use-handle-check";
 import WeekTiles from "../week-tiles";
 import InfoBox from "../info-box";
+import HeatMap from "../heat-map";
 
 interface HabitDetailsClientPageProps {
     habit: Habit
@@ -118,6 +119,20 @@ export default function HabitDetailsClientPage({ habit: h, habitEntries }: Habit
                 onResult={setEntries}
                 streakYesterday={streakYesterday}
             />
+            <div className='space-y-8'>
+                <div className="w-full space-y-4 border rounded-lg p-6">
+                    <div className="flex justify-between items-center">
+                        <h2 className="font-medium">Activity</h2>
+                        <p className="text-muted-foreground text-sm">Last year</p>
+                    </div>
+                    <HeatMap
+                        startDate={subYears(date, 1)}
+                        endDate={date}
+                        entries={entries}
+                        habitsNum={1}
+                    />
+                </div>
+            </div>
         </>
     )
 }
