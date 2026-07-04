@@ -23,6 +23,24 @@ export const getHabitsForCurrentUser = cache(async (): Promise<ServerActionRespo
     }
 });
 
+export const getHabit = cache(async (habitId: Habit['id']): Promise<ServerActionResponse<Habit>> => {
+    'use server'
+    const session = await requireSession();
+
+    try {
+        const habit = await prisma.habit.findUnique({
+            where: { userId: session.user.id, id: habitId },
+        });
+        if (!habit)
+            return { success: false, error: "Habit not found." }
+        
+        return { success: true, data: habit };
+    } catch (error) {
+        console.error("Error fetching habits:", error);
+        return { success: false, error: "Failed to fetch habits." }
+    }
+})
+
 export async function createHabit(formData: FormData): Promise<ServerActionResponse<Habit>> {
     'use server'
     const { user } = await requireSession();
