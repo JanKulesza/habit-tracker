@@ -1,23 +1,21 @@
 "use client"
 import { Entry, Habit } from "@/generated/prisma/client"
-import { switchEntry } from "@/lib/dal/entries";
-import { cn } from "@/lib/utils";
+import { cn, formatEntriesByDate } from "@/lib/utils";
 import { addDays, endOfWeek, format, isBefore, startOfWeek } from "date-fns";
 import { pl } from "date-fns/locale";
 import { Check, X } from "lucide-react";
-import { Dispatch, SetStateAction, useState } from "react";
+import { Dispatch, SetStateAction } from "react";
 import { ScrollArea, ScrollBar } from "./ui/scroll-area";
-import { toast } from "sonner";
+import Tile from "./tile";
 
 type WeekTilesProps =
     | {
-        entriesThisWeek: Record<string, Entry[]>
         habitsNum: number
         habitId: null
+        currentEntriesSnapshot: Entry[]
     }
     | {
-        entriesThisWeek: Record<string, Entry[]>
-        habitsNum: number
+        habitsNum?: 1
         habitId: Habit['id']
         streakYesterday: number
         onResult: Dispatch<SetStateAction<Entry[]>>
@@ -25,9 +23,11 @@ type WeekTilesProps =
     };
 
 export default function WeekTiles(props: WeekTilesProps) {
-    const { entriesThisWeek, habitsNum, habitId } = props
+    const { habitsNum, habitId } = props,
+            entriesThisWeek = formatEntriesByDate(props.currentEntriesSnapshot, startOfWeek(new Date(), { locale: pl }));
     let entriesArr: {
         date: Date,
+        entryId: Entry['id'] | null,
         day: string,
         checked: boolean,
         ofr: boolean
@@ -38,6 +38,7 @@ export default function WeekTiles(props: WeekTilesProps) {
         if (entriesThisDay && entriesThisDay.length > 0)
             entriesArr.push({
                 date: i,
+                entryId: habitId ? entriesThisDay.find(val => val.habitId === habitId)?.id ?? null : null,
                 day: format(i, 'EEEEEE'),
                 checked: !habitId
                     ? entriesThisDay.length === habitsNum
@@ -47,53 +48,11 @@ export default function WeekTiles(props: WeekTilesProps) {
         else
             entriesArr.push({
                 date: i,
+                entryId: null,
                 day: format(i, 'EEEEEE'),
                 checked: false,
                 ofr: !entriesThisDay
             })
-    }
-
-    const [isPending, setIsPending] = useState(false)
-    const handleCheck = async (date: Date, checked: boolean) => {
-        // If HABITID isn't null then all undefined values are defined
-        if (!habitId || isPending || habitId === -1)
-            return
-        const { currentEntriesSnapshot, onResult, streakYesterday } = props
-        const snapshot = [...currentEntriesSnapshot];
-        const action: "Remove" | "Create" =
-            currentEntriesSnapshot.some(en => en.date === format(new Date(), 'yyyy-MM-dd') && en.habitId === habitId) ? "Remove" : "Create"
-
-        if (action === "Remove")
-            onResult([...currentEntriesSnapshot.filter(en => !(en.date === format(new Date(), 'yyyy-MM-dd') && en.habitId === habitId))])
-        else
-            onResult([...currentEntriesSnapshot, {
-                id: -1,
-                date: format(new Date(), 'yyyy-MM-dd'),
-                habitId,
-                streak: streakYesterday + 1
-            }])
-
-        setIsPending(true);
-         try {
-            const res = await switchEntry(habitId, date);
-
-            if (!res?.success) {
-                toast.error(res.error);
-                onResult(snapshot)
-            } else if (res.data) {
-                onResult(prevEntries => {
-                    const filtered = prevEntries.filter(e => e.habitId !== habitId);
-                    return [...filtered, res.data!];
-                });
-                toast.success("Completed habit!")
-            } else
-                toast.success("Unchecked habit.")
-        } catch (error) {
-            toast.error("Network error. Please check your connection and try again.");
-            onResult(snapshot);
-        } finally {
-            setIsPending(false);
-        }
     }
 
     return (
@@ -101,23 +60,33 @@ export default function WeekTiles(props: WeekTilesProps) {
             <h2 className="font-medium">This week</h2>
             <ScrollArea>
                 <div className="flex gap-2 py-2">
-                    {entriesArr.map((entry, i) =>
-                        <div
+                    {entriesArr.map((entry, i) => {
+                        if (!habitId)
+                            return (
+                                <div
+                                    key={i}
+                                    aria-disabled={entry.ofr}
+                                    className={cn("border flex flex-col min-w-12 flex-1 gap-4 items-center rounded-lg p-2 pb-4 text-xs aria-disabled:opacity-60 aria-disabled:text-muted-foreground",
+                                        entry.checked && "bg-primary border-primary text-white",
+                                        entry.day === format(new Date(), 'EEEEEE') && "outline-2 outline-primary outline-offset-2",
+                                    )}
+                                >
+                                    {entry.day}
+                                    {entry.checked ? <Check className="size-4" /> : <X className="size-4 text-muted-foreground" />}
+                                </div>
+                            )
+                        return <Tile
                             key={i}
-                            aria-disabled={entry.ofr}
-                            className={cn("border flex flex-col min-w-12 flex-1 gap-4 items-center rounded-lg p-2 pb-4 text-xs aria-disabled:opacity-60 aria-disabled:text-muted-foreground",
-                                entry.checked && "bg-primary border-primary text-white",
-                                entry.day === format(new Date(), 'EEEEEE') && "outline-2 outline-primary outline-offset-2",
-                                habitId && !entry.ofr && "cursor-pointer"
-                            )}
-                            onClick={() => {
-                                if (!entry.ofr)
-                                    handleCheck(entry.date, entry.checked);
-                            }}
-                        >
-                            {entry.day}
-                            {entry.checked ? <Check className="size-4" /> : <X className="size-4 text-muted-foreground" />}
-                        </div>
+                            entryId={entry.entryId}
+                            day={entry.day}
+                            isOutOfRange={entry.ofr}
+                            date={entry.date}
+                            habitId={habitId}
+                            streakYesterday={0}
+                            onResult={props.onResult}
+                            currentEntriesSnapshot={props.currentEntriesSnapshot}
+                        />
+                    }
                     )}
                 </div>
                 <ScrollBar orientation="horizontal" className="mt-4" />

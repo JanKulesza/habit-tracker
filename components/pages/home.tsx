@@ -122,7 +122,7 @@ export default function HomePageClient({ userName, entries: se, habits: sh }: Ho
                     })}
                 </div>
                 <div className='space-y-8 lg:w-2/5'>
-                    <WeekTiles entriesThisWeek={entriesThisWeek} habitsNum={habits.length} habitId={null} />
+                    <WeekTiles currentEntriesSnapshot={entries} habitsNum={habits.length} habitId={null} />
                     <div className="w-full space-y-4 border rounded-lg p-6">
                         <div className="flex justify-between items-center">
                             <h2 className="font-medium">Activity</h2>

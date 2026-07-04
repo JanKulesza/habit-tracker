@@ -13,11 +13,10 @@ export const useHandleCheck = (
 ) => {
     const [isPending, setIsPending] = useState(false)
 
-    const handleCheck = async () => {
+    const handleCheck = async (date: Date = new Date()) => {
         const snapshot = [...currentEntriesSnapshot],
-            date = new Date(),
             mockId = -Date.now();
-
+        
         if (entryId)
             onResult(currentEntriesSnapshot.filter(e => e.id !== entryId));
         else

@@ -22,7 +22,7 @@ export default function HabitBar({ habit, entryId, streakYesterday, onResult, cu
         <div className='flex py-4 items-center border-b gap-4'>
             <Checkbox
                 checked={isChecked}
-                onCheckedChange={handleCheck}
+                onCheckedChange={() => handleCheck()}
                 className="rounded-xl size-7 cursor-pointer"
                 disabled={isPending}
             />

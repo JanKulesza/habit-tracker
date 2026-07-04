@@ -8,6 +8,7 @@ import { formatEntriesByDate } from "@/lib/utils";
 import { pl } from "date-fns/locale";
 import { Calendar, Check, Edit, Target, Trash2 } from "lucide-react";
 import { useHandleCheck } from "@/lib/hooks/use-handle-check";
+import WeekTiles from "../week-tiles";
 
 interface HabitDetailsClientPageProps {
     habit: Habit
@@ -45,14 +46,19 @@ export default function HabitDetailsClientPage({ habit: h, habitEntries }: Habit
                     </div>
                 </div>
                 <div className="flex gap-2 items-center">
-                    <Button onClick={handleCheck} variant={isChecked ? "default" : "secondary"} disabled={isPending} size="lg" className="font-normal p-5">
+                    <Button onClick={() => handleCheck()} variant={isChecked ? "default" : "secondary"} disabled={isPending} size="lg" className="font-normal p-5">
                         <Check /> {isChecked ? "Completed for today" : "Check for today"}
                     </Button>
                     <Button variant="outline" className="font-normal p-5"><Edit /></Button>
                     <Button variant="destructive" className="font-normal p-5"><Trash2 /></Button>
                 </div>
-
             </div>
+            <WeekTiles
+                currentEntriesSnapshot={entries}
+                habitId={habit.id}
+                onResult={setEntries}
+                streakYesterday={streakYesterday}
+            />
         </>
     )
 }
