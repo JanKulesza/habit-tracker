@@ -2,8 +2,10 @@
 import { Entry, Habit } from '@/generated/prisma/client'
 import { format, subDays } from 'date-fns';
 import { useState } from 'react'
-import AddHabitBtn from '../add-habit-btn';
+import UpsertHabitBtn from '../upsert-habit-btn';
 import HabitBox from '../habit-box';
+import { Button } from '../ui/button';
+import { Plus } from 'lucide-react';
 
 interface HabitsPageCientProps {
     entries: Entry[]
@@ -21,7 +23,9 @@ export default function HabitsPageClient({ entries: se, habits: sh }: HabitsPage
                     <h1 className="text-2xl font-medium">Habits</h1>
                     <p className="text-sm text-muted-foreground">{habits.length} habits · You have {entriesToday.length} habits completed today</p>
                 </div>
-                <AddHabitBtn currentHabitsSnapshot={habits} onResult={(result) => { setHabits(result) }} />
+                <UpsertHabitBtn currentHabitsSnapshot={habits} onResult={setHabits}>
+                    <Button className='p-5 px-8 w-full'> <Plus /> Add habit</Button>
+                </UpsertHabitBtn>
             </div>
             <div className='grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4'>
                 {habits.map((h, idx) => {

@@ -33,7 +33,7 @@ export const getHabit = cache(async (habitId: Habit['id']): Promise<ServerAction
         });
         if (!habit)
             return { success: false, error: "Habit not found." }
-        
+
         return { success: true, data: habit };
     } catch (error) {
         console.error("Error fetching habits:", error);
@@ -60,6 +60,42 @@ export async function createHabit(formData: FormData): Promise<ServerActionRespo
                 name: data.name,
                 goal: data.goal,
                 icon: data.icon,
+                userId: user.id,
+            }
+        })
+        return { success: true, data: habit };
+    } catch (error) {
+        console.error("Error creating habit:", error);
+        return { success: false, error: "Failed to create habit." }
+    }
+}
+
+export async function updateHabit(habitId: Habit['id'], formData: FormData): Promise<ServerActionResponse<Habit>> {
+    'use server'
+    const { user } = await requireSession();
+    try {
+
+        const existingHabit = await prisma.habit.findUnique({
+            where: { id: habitId },
+        });
+        if (!existingHabit)
+            return { success: false, error: "Habit not found." }
+
+        const { success, error, data } = await habitsSchema.partial().safeParseAsync({
+            name: formData.get('name')?.toString(),
+            goal: formData.get('goal')?.toString(),
+            icon: formData.get('icon')?.toString()
+        });
+
+        if (!success)
+            return { success: false, error: formatZodErrors(error) };
+
+        const habit = await prisma.habit.update({
+            where: {
+                id: habitId
+            },
+            data: {
+                ...data,
                 userId: user.id,
             }
         })

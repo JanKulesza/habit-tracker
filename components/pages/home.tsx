@@ -3,16 +3,17 @@ import Link from 'next/link';
 import HabitBar from '../habit-bar';
 import InfoBox from '../info-box';
 import { ProgressU } from '../ui/progress-updated';
-import AddHabitBtn from '../add-habit-btn';
+import UpsertHabitBtn from '../upsert-habit-btn';
 import { formatEntriesByDate } from '@/lib/utils';
 import { endOfWeek, format, startOfWeek, subDays, subWeeks } from 'date-fns';
 import { pl } from 'date-fns/locale';
 import { sort } from 'fast-sort';
-import { Target, Flame, Medal, TrendingUp } from 'lucide-react';
+import { Target, Flame, Medal, TrendingUp, Plus } from 'lucide-react';
 import { Entry, Habit } from '@/generated/prisma/client';
 import { useState } from 'react';
 import WeekTiles from '../week-tiles';
 import HeatMap from '../heat-map';
+import { Button } from '../ui/button';
 
 interface HomePageCientProps {
     userName: string
@@ -74,7 +75,9 @@ export default function HomePageClient({ userName, entries: se, habits: sh }: Ho
                     <h1 className="text-2xl font-medium">Hi, {userName} 👋</h1>
                     <p className="text-sm text-muted-foreground">{format(new Date(), "eeee, d MMMM", { locale: pl })} · You have {habits.length - entriesToday.length} habits left today</p>
                 </div>
-                <AddHabitBtn currentHabitsSnapshot={habits} onResult={(result) => {setHabits(result)}} />
+                <UpsertHabitBtn currentHabitsSnapshot={habits} onResult={setHabits}>
+                    <Button className='p-5 px-8 w-full'> <Plus /> Add habit</Button>
+                </UpsertHabitBtn>
             </div>
             <div className="w-full space-y-4 border rounded-lg p-6">
                 <div className="flex justify-between items-center">

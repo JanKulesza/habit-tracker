@@ -11,6 +11,7 @@ import { useHandleCheck } from "@/lib/hooks/use-handle-check";
 import WeekTiles from "../week-tiles";
 import InfoBox from "../info-box";
 import HeatMap from "../heat-map";
+import UpsertHabitBtn from "../upsert-habit-btn";
 
 interface HabitDetailsClientPageProps {
     habit: Habit
@@ -94,10 +95,12 @@ export default function HabitDetailsClientPage({ habit: h, habitEntries }: Habit
                     </div>
                 </div>
                 <div className="flex gap-2 items-center">
-                    <Button onClick={() => handleCheck()} variant={isChecked ? "default" : "secondary"} disabled={isPending} size="lg" className="font-normal p-5">
+                    <Button onClick={() => handleCheck()} variant={!isChecked ? "default" : "secondary"} disabled={isPending} size="lg" className="font-normal p-5">
                         <Check /> {isChecked ? "Completed for today" : "Check for today"}
                     </Button>
-                    <Button variant="outline" className="font-normal p-5"><Edit /></Button>
+                    <UpsertHabitBtn habit={habit} onResult={setHabit}>
+                        <Button variant="outline" className="font-normal p-5"><Edit /></Button>
+                    </UpsertHabitBtn>
                     <Button variant="destructive" className="font-normal p-5"><Trash2 /></Button>
                 </div>
             </div>
