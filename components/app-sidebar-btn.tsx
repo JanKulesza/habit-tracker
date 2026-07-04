@@ -1,22 +1,26 @@
-import { LucideProps } from 'lucide-react'
+"use client"
+
 import { Button } from './ui/button'
 import Link from 'next/link'
-import { FC } from 'react'
+import { ReactNode } from 'react'
+import { cn } from '@/lib/utils'
+import { usePathname } from 'next/navigation'
 
 interface AppSidebarBtnProps {
-    text: string,
     href: string,
-    icon: FC<LucideProps>
+    children: ReactNode
 }
 
-export default function AppSidebarBtn({text,href,icon: Icon}: AppSidebarBtnProps) {
+export default function AppSidebarBtn({ href, children }: AppSidebarBtnProps) {
+    const pathname = usePathname();
+    
     return (
-        <Button asChild variant="ghost" className="text-muted-foreground justify-start items-center gap-4 h-10 font-normal">
-            <Link href={href} className="">
-                <Icon className="h-4.5! w-4.5!" />
-                <span className="transition-all duration-300 ease-in-out overflow-hidden whitespace-nowrap data-[state=collapsed]:w-0 data-[state=collapsed]:opacity-0 data-[state=expanded]:w-auto">
-                    {text}
-                </span>
+        <Button asChild variant="ghost" className={cn(
+            "text-muted-foreground justify-start items-center gap-4 h-10 font-normal", 
+            pathname === href && "bg-muted text-foreground"
+        )}>
+            <Link href={href}>
+                {children}
             </Link>
         </Button>
     )

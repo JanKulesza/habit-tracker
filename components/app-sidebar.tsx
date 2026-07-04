@@ -8,7 +8,7 @@ import { requireSession } from "@/lib/dal/session";
 
 // group-data-state is used to automatically detect parent's (Sidebar) collapse state and improve UX
 export default async function AppSidebar() {
-    const {user} = await requireSession();
+    const { user } = await requireSession();
     return (
         <Sidebar collapsible="icon" className="h-screen">
             <SidebarHeader className="flex-row justify-start items-center my-4 p-1.5
@@ -25,12 +25,32 @@ export default async function AppSidebar() {
                     Streak
                 </h2>
             </SidebarHeader>
-            <SidebarContent className="transition-all duration-300 ease-in-out p-1
+            <SidebarContent className="transition-all duration-300 ease-in-out p-1 space-y-2
             group-data-[state=expanded]:mx-2 group-data-[state=expanded]:p-2">
-                <AppSidebarBtn href="/" icon={Home} text="Home" />
-                <AppSidebarBtn href="/habits" icon={ListTodo} text="Habits" />
-                <AppSidebarBtn href="/stats" icon={ChartColumn} text="Stats" />
-                <AppSidebarBtn href="/settings" icon={Settings} text="Settings" />
+                <AppSidebarBtn href="/" >
+                    <Home className="h-4.5! w-4.5!" />
+                    <span className="transition-all duration-300 ease-in-out overflow-hidden whitespace-nowrap data-[state=collapsed]:w-0 data-[state=collapsed]:opacity-0 data-[state=expanded]:w-auto">
+                        Home
+                    </span>
+                </AppSidebarBtn>
+                <AppSidebarBtn href="/habits" >
+                    <ListTodo />
+                    <span className="transition-all duration-300 ease-in-out overflow-hidden whitespace-nowrap data-[state=collapsed]:w-0 data-[state=collapsed]:opacity-0 data-[state=expanded]:w-auto">
+                        Habits
+                    </span>
+                </AppSidebarBtn>
+                <AppSidebarBtn href="/stats" >
+                    <ChartColumn />
+                    <span className="transition-all duration-300 ease-in-out overflow-hidden whitespace-nowrap data-[state=collapsed]:w-0 data-[state=collapsed]:opacity-0 data-[state=expanded]:w-auto">
+                        Stats
+                    </span>
+                </AppSidebarBtn>
+                <AppSidebarBtn href="/settings" >
+                    <Settings />
+                    <span className="transition-all duration-300 ease-in-out overflow-hidden whitespace-nowrap data-[state=collapsed]:w-0 data-[state=collapsed]:opacity-0 data-[state=expanded]:w-auto">
+                        Settings
+                    </span>
+                </AppSidebarBtn>
             </SidebarContent>
             <SidebarFooter className="flex-row justify-between 
                 transition-all duration-300 ease-in-out 
