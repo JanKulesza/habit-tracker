@@ -4,12 +4,16 @@ import CustomRadarChart from "@/components/charts/radar-chart";
 import InfoBox from "@/components/info-box";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "@/components/ui/card";
 import { ChartConfig } from "@/components/ui/chart";
+import { ProgressU } from "@/components/ui/progress-updated";
+import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
+import { Separator } from "@/components/ui/separator";
 import { getEntriesForCurrentUser } from "@/lib/dal/entries";
 import { getHabitsForCurrentUser } from "@/lib/dal/habits";
 import { completionRatePerRange } from "@/lib/utils";
 import { subDays, startOfDay, format, isAfter } from "date-fns";
 import { sort } from "fast-sort";
 import { TrendingUp, Flame, Medal, Check, TrendingDown } from "lucide-react";
+import { Fragment } from "react/jsx-runtime";
 import { toast } from "sonner";
 
 export default async function StatsPage() {
@@ -96,8 +100,9 @@ export default async function StatsPage() {
         },
     } satisfies ChartConfig
 
-    const barChartData = habits.map(h => ({
-        name: h.icon,
+    const entriesPerHabitLast30days = habits.map(h => ({
+        name: h.name,
+        icon: h.icon,
         entries: entries.filter(e => e.habitId === h.id && isAfter(e.date, subDays(date, 31))).length
     }))
 
@@ -172,12 +177,12 @@ export default async function StatsPage() {
                     </CardContent>
                     <CardFooter className="h-24">
                         <div className="grid gap-2">
-                            <p>
+                            <div className="leading-none font-medium">
                                 <span className="font-semibold text-foreground">
                                     {sort(radarChartData).desc((d) => d.completion)[0].name}
                                 </span> {" "}
                                 has the highest completion rate this month
-                            </p>
+                            </div>
                             <div className="text-muted-foreground">
                                 {format(date, "LLL yyyy")}
                             </div>
@@ -186,20 +191,59 @@ export default async function StatsPage() {
                 </Card>
             </div>
             <div className="flex flex-col lg:flex-row gap-4 w-full">
-                <Card className="lg:w-1/2">
+                <Card className="lg:w-1/2 h-fit">
                     <CardHeader>
-                        <CardTitle>lorem</CardTitle>
-                        <CardDescription>lorem</CardDescription>
+                        <CardTitle>Habit Performance</CardTitle>
+                        <CardDescription>Number of completions by habit in the last 30 days</CardDescription>
                     </CardHeader>
                     <CardContent>
-                        <CustomBarChart chartConfig={barChartConfig} chartData={barChartData} dataKeyChart="entries" labels="name" className="w-full" />
+                        <ScrollArea className="h-96">
+                            <CustomBarChart chartConfig={barChartConfig} chartData={entriesPerHabitLast30days} dataKeyChart="entries" labels="icon" className="w-full" />
+                            <ScrollBar orientation="vertical" />
+                        </ScrollArea>
+                    </CardContent>
+                    <CardFooter className="flex-col items-start gap-2 text-sm">
+                        <div className="leading-none font-medium">
+                            <span className="text-primary font-semibold">{entriesPerHabitLast30days.reduce((acc, val) => acc += val.entries, 0)} completions</span> recorded in the last 30 days.
+                        </div>
+                        <div className="leading-none text-muted-foreground">
+                            Average of {(entriesPerHabitLast30days.reduce((acc, val) => acc += val.entries, 0) / 30).toFixed(1)} per day
+                        </div>
+                    </CardFooter>
+                </Card>
+                <Card className="lg:w-1/2 h-fit">
+                    <CardHeader>
+                        <CardTitle>Habit ranking</CardTitle>
+                        <CardDescription>Ranked by completion rate over the last 30 days</CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                        <ScrollArea className="h-96">
+                            {sort(radarChartData).desc(val => val.completion).map((val, idx) => {
+                                return (
+                                    <Fragment key={idx}>
+                                        <div className="flex justify-between items-center p-4 mb-2">
+                                            <div className="flex items-center">
+                                                <span className="text-muted-foreground mr-4 text-sm">{idx + 1}</span>
+                                                {val.name}
+                                            </div>
+                                            <div className="flex items-center gap-4">
+                                                <ProgressU value={val.completion} className="w-32" max={100} />
+                                                <span className="text-muted-foreground mr-4">{val.completion}%</span>
+                                            </div>
+                                        </div>
+                                        <Separator className="mb-2" />
+                                    </Fragment>
+                                )
+                            })}
+                            <ScrollBar orientation="vertical" />
+                        </ScrollArea>
                     </CardContent>
                     <CardFooter className="flex-col items-start gap-2 text-sm">
                         <div className="flex gap-2 leading-none font-medium">
-                            Trending up by 5.2% this month <TrendingUp className="h-4 w-4" />
+                            {sort(radarChartData).desc((d) => d.completion)[0].name} remains the top-performing habit at <span className="text-primary font-semibold">{sort(radarChartData).desc((d) => d.completion)[0].completion}%</span>
                         </div>
                         <div className="leading-none text-muted-foreground">
-                            Showing total visitors for the last 6 months
+                            Higher completion rate means better consistency.
                         </div>
                     </CardFooter>
                 </Card>
