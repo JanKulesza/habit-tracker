@@ -1,6 +1,6 @@
 import { Entry } from "@/generated/prisma/client";
 import { clsx, type ClassValue } from "clsx"
-import { addDays, format, isAfter } from "date-fns";
+import { addDays, format, isAfter, isBefore, isWithinInterval, startOfWeek } from "date-fns";
 import { twMerge } from "tailwind-merge"
 import { ZodError } from "zod";
 
@@ -31,4 +31,13 @@ export function formatEntriesByDate(entries: Entry[], startDate: Date): Record<s
   }
 
   return formatted
+}
+
+export function completionRatePerRange(startDate: Date, numberOfDays: number, entries: Entry[], habitsNum: number) {
+  return (
+    Number(
+      (entries.reduce((acc, cur) => 
+        isWithinInterval(cur.date, { start: startDate, end: addDays(startDate, numberOfDays) }) ? acc + 1 : acc
+      , 0) / (habitsNum * numberOfDays) * 100).toFixed(0))
+  );
 }

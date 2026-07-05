@@ -1,8 +1,12 @@
+import WeekTrendAreaChart from "@/components/charts/week-trend-area-chart";
 import InfoBox from "@/components/info-box";
+import { ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
 import { getEntriesForCurrentUser } from "@/lib/dal/entries";
 import { getHabitsForCurrentUser } from "@/lib/dal/habits";
-import { subDays, startOfDay, format } from "date-fns";
+import { completionRatePerRange } from "@/lib/utils";
+import { subDays, startOfDay, format, subMonths } from "date-fns";
 import { TrendingUp, Flame, Medal, Check } from "lucide-react";
+import { CartesianGrid, XAxis, Area, AreaChart } from "recharts";
 import { toast } from "sonner";
 
 export default async function StatsPage() {
@@ -14,17 +18,8 @@ export default async function StatsPage() {
     const habits = resHab.data, entries = resEntr.data;
     const date = new Date();
 
-    const { last30DaysPercent, lastWeekPercent } = (() => {
-        let entries30 = 0, entries7 = 0;
-
-        for (let i = 0; i < 30; i++) {
-            entries30 += entries.filter(e => e.date === format(subDays(startOfDay(date), i), 'yyyy-MM-dd')).length;
-            if (i == 6)
-                entries7 = entries30;
-        }
-
-        return { last30DaysPercent: ((entries30 * 100) / (30 * habits.length)).toFixed(0), lastWeekPercent: ((entries7 * 100) / (7 * habits.length)).toFixed(0) };
-    })(),
+    const lastMonthCompletionRate = completionRatePerRange(subDays(date, 30), 30, entries, habits.length),
+        lastWeekCompletionRate = completionRatePerRange(subDays(date, 7), 7, entries, habits.length),
         bestStreak = entries.reduce((acc, curr) =>
             curr.streak > acc.streak ? { streak: curr.streak, name: curr.habitId } : acc,
             { streak: 0, name: -1 });
@@ -34,14 +29,14 @@ export default async function StatsPage() {
             title: "30 days",
             icon: TrendingUp,
             iconColor: "text-[#6ec58e]",
-            text: `${last30DaysPercent}%`,
+            text: `${lastMonthCompletionRate}%`,
             description: "Completion rate"
         },
         {
             title: "This week",
             icon: Flame,
             iconColor: "text-[#fa914a]",
-            text: `${lastWeekPercent}%`,
+            text: `${lastWeekCompletionRate}%`,
             description: "Completion rate",
         },
         {
@@ -60,6 +55,24 @@ export default async function StatsPage() {
         },
 
     ]
+    const chartData = (() => {
+        let data: { date: string, completion: number }[] = [];
+
+        for (let i = 12; i >= 1; i--)
+            data.push({
+                date: format(subDays(startOfDay(date), 7 * i), "dd LLL"),
+                completion: completionRatePerRange(subDays(date, 7 * i), 7, entries, habits.length)
+            })
+
+        return data;
+    })()
+
+    const chartConfig = {
+        mobile: {
+            label: "Desktop",
+            color: "#2563eb",
+        },
+    } satisfies ChartConfig
 
     return (
         <>
@@ -79,6 +92,16 @@ export default async function StatsPage() {
                     />
                 )}
             </div>
+            <div className="flex flex-col lg:flex-row gap-4 w-full">
+                <div className="w-2/3 space-y-8 border rounded-lg p-6">
+                    <div className="">
+                        <h2 className="font-medium">Week trend</h2>
+                        <p className="text-muted-foreground text-sm">Completion percent in rect weeks</p>
+                    </div>
+                    <WeekTrendAreaChart chartConfig={chartConfig} chartData={chartData} dataKeyChart="completion" dataKeyXAxis="date" />
+                </div>
+            </div>
+
         </>
     )
 }
