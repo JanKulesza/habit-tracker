@@ -117,12 +117,15 @@ export default function HabitDetailsClientPage({ habit: h, habitEntries }: Habit
                     />
                 )}
             </div>
-            <WeekTiles
-                currentEntriesSnapshot={entries}
-                habitId={habit.id}
-                onResult={setEntries}
-                streakYesterday={streakYesterday}
-            />
+            <div className='w-full space-y-4 border rounded-lg p-6'>
+                <h2 className="font-medium">This week</h2>
+                <WeekTiles
+                    currentEntriesSnapshot={entries}
+                    habitId={habit.id}
+                    onResult={setEntries}
+                    streakYesterday={streakYesterday}
+                />
+            </div>
             <div className='space-y-8'>
                 <div className="w-full space-y-4 border rounded-lg p-6">
                     <div className="flex justify-between items-center">

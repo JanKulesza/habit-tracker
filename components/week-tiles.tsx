@@ -24,7 +24,7 @@ type WeekTilesProps =
 
 export default function WeekTiles(props: WeekTilesProps) {
     const { habitsNum, habitId } = props,
-            entriesThisWeek = formatEntriesByDate(props.currentEntriesSnapshot, startOfWeek(new Date(), { locale: pl }));
+        entriesThisWeek = formatEntriesByDate(props.currentEntriesSnapshot, startOfWeek(new Date(), { locale: pl }));
     let entriesArr: {
         date: Date,
         entryId: Entry['id'] | null,
@@ -56,41 +56,39 @@ export default function WeekTiles(props: WeekTilesProps) {
     }
 
     return (
-        <div className='w-full space-y-4 border rounded-lg p-6'>
-            <h2 className="font-medium">This week</h2>
-            <ScrollArea>
-                <div className="flex gap-2 py-2">
-                    {entriesArr.map((entry, i) => {
-                        if (!habitId)
-                            return (
-                                <div
-                                    key={i}
-                                    aria-disabled={entry.ofr}
-                                    className={cn("border flex flex-col min-w-12 flex-1 gap-4 items-center rounded-lg p-2 pb-4 text-xs aria-disabled:opacity-60 aria-disabled:text-muted-foreground",
-                                        entry.checked && "bg-primary border-primary text-white",
-                                        entry.day === format(new Date(), 'EEEEEE') && "outline-2 outline-primary outline-offset-2",
-                                    )}
-                                >
-                                    {entry.day}
-                                    {entry.checked ? <Check className="size-4" /> : <X className="size-4 text-muted-foreground" />}
-                                </div>
-                            )
-                        return <Tile
-                            key={i}
-                            entryId={entry.entryId}
-                            day={entry.day}
-                            isOutOfRange={entry.ofr}
-                            date={entry.date}
-                            habitId={habitId}
-                            streakYesterday={0}
-                            onResult={props.onResult}
-                            currentEntriesSnapshot={props.currentEntriesSnapshot}
-                        />
-                    }
-                    )}
-                </div>
-                <ScrollBar orientation="horizontal" className="mt-4" />
-            </ScrollArea>
-        </div>
+
+        <ScrollArea>
+            <div className="flex gap-2 p-1">
+                {entriesArr.map((entry, i) => {
+                    if (!habitId)
+                        return (
+                            <div
+                                key={i}
+                                aria-disabled={entry.ofr}
+                                className={cn("border flex flex-col min-w-12 flex-1 gap-4 items-center rounded-lg p-2 pb-4 text-xs aria-disabled:opacity-60 aria-disabled:text-muted-foreground",
+                                    entry.checked && "bg-primary border-primary text-white",
+                                    entry.day === format(new Date(), 'EEEEEE') && "outline-2 outline-primary outline-offset-2",
+                                )}
+                            >
+                                {entry.day}
+                                {entry.checked ? <Check className="size-4" /> : <X className="size-4 text-muted-foreground" />}
+                            </div>
+                        )
+                    return <Tile
+                        key={i}
+                        entryId={entry.entryId}
+                        day={entry.day}
+                        isOutOfRange={entry.ofr}
+                        date={entry.date}
+                        habitId={habitId}
+                        streakYesterday={0}
+                        onResult={props.onResult}
+                        currentEntriesSnapshot={props.currentEntriesSnapshot}
+                    />
+                }
+                )}
+            </div>
+            <ScrollBar orientation="horizontal" className="mt-4" />
+        </ScrollArea>
     )
 }
