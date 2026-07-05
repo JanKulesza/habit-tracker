@@ -1,4 +1,5 @@
 import CustomAreaChart from "@/components/charts/area-chart";
+import CustomBarChart from "@/components/charts/bar-char";
 import CustomRadarChart from "@/components/charts/radar-chart";
 import InfoBox from "@/components/info-box";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "@/components/ui/card";
@@ -6,9 +7,9 @@ import { ChartConfig } from "@/components/ui/chart";
 import { getEntriesForCurrentUser } from "@/lib/dal/entries";
 import { getHabitsForCurrentUser } from "@/lib/dal/habits";
 import { completionRatePerRange } from "@/lib/utils";
-import { subDays, startOfDay, format } from "date-fns";
+import { subDays, startOfDay, format, isAfter } from "date-fns";
 import { sort } from "fast-sort";
-import { TrendingUp, Flame, Medal, Check } from "lucide-react";
+import { TrendingUp, Flame, Medal, Check, TrendingDown } from "lucide-react";
 import { toast } from "sonner";
 
 export default async function StatsPage() {
@@ -71,7 +72,7 @@ export default async function StatsPage() {
 
     const areaChartConfig = {
         completion: {
-            label: "Completion %",
+            label: "Completion % per week",
             color: "var(--primary)",
         },
     } satisfies ChartConfig
@@ -90,7 +91,19 @@ export default async function StatsPage() {
 
     const radarChartConfig = {
         completion: {
-            label: "Completion %",
+            label: "Completion % per habit",
+            color: "var(--primary)"
+        },
+    } satisfies ChartConfig
+
+    const barChartData = habits.map(h => ({
+        name: h.icon,
+        entries: entries.filter(e => e.habitId === h.id && isAfter(e.date, subDays(date, 31))).length
+    }))
+
+    const barChartConfig = {
+        entries: {
+            label: "Entries ",
             color: "var(--primary)"
         },
     } satisfies ChartConfig
@@ -129,7 +142,15 @@ export default async function StatsPage() {
                     <CardFooter className="h-24">
                         <div className="grid gap-2">
                             <div className="flex items-center gap-2 leading-none font-medium">
-                                Trending up by 5.2% this month <TrendingUp className="h-4 w-4" />
+                                {
+                                    areaChartData[areaChartData.length - 1].completion > areaChartData[areaChartData.length - 2].completion
+                                        ? <>
+                                            Trending up by <span className="font-semibold text-primary">{areaChartData[areaChartData.length - 1].completion - areaChartData[areaChartData.length - 2].completion}%</span> this month <TrendingUp className="h-4 w-4" />
+                                        </>
+                                        : <>
+                                            Trending down by <span className="font-semibold text-destructive">{areaChartData[areaChartData.length - 2].completion - areaChartData[areaChartData.length - 1].completion}%</span> this month <TrendingDown className="h-4 w-4 rotate-180" />
+                                        </>
+                                }
                             </div>
                             <div className="flex items-center gap-2 leading-none text-muted-foreground">
                                 {format(subDays(date, 7 * 12), "dd LLL yyyy")} - {format(date, "dd LLL yyyy")}
@@ -152,11 +173,33 @@ export default async function StatsPage() {
                     <CardFooter className="h-24">
                         <div className="grid gap-2">
                             <p>
-                                <span className="font-semibold text-foreground">{sort(radarChartData).desc((d) => d.completion)[0].name}</span> has the highest completion rate this month
+                                <span className="font-semibold text-foreground">
+                                    {sort(radarChartData).desc((d) => d.completion)[0].name}
+                                </span> {" "}
+                                has the highest completion rate this month
                             </p>
                             <div className="text-muted-foreground">
                                 {format(date, "LLL yyyy")}
                             </div>
+                        </div>
+                    </CardFooter>
+                </Card>
+            </div>
+            <div className="flex flex-col lg:flex-row gap-4 w-full">
+                <Card className="lg:w-1/2">
+                    <CardHeader>
+                        <CardTitle>lorem</CardTitle>
+                        <CardDescription>lorem</CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                        <CustomBarChart chartConfig={barChartConfig} chartData={barChartData} dataKeyChart="entries" labels="name" className="w-full" />
+                    </CardContent>
+                    <CardFooter className="flex-col items-start gap-2 text-sm">
+                        <div className="flex gap-2 leading-none font-medium">
+                            Trending up by 5.2% this month <TrendingUp className="h-4 w-4" />
+                        </div>
+                        <div className="leading-none text-muted-foreground">
+                            Showing total visitors for the last 6 months
                         </div>
                     </CardFooter>
                 </Card>
