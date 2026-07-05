@@ -1,4 +1,5 @@
-import WeekTrendAreaChart from "@/components/charts/week-trend-area-chart";
+import CustomAreaChart from "@/components/charts/area-chart";
+import CustomRadarChart from "@/components/charts/radar-chart";
 import InfoBox from "@/components/info-box";
 import { ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
 import { getEntriesForCurrentUser } from "@/lib/dal/entries";
@@ -55,7 +56,7 @@ export default async function StatsPage() {
         },
 
     ]
-    const chartData = (() => {
+    const areaChartData = (() => {
         let data: { date: string, completion: number }[] = [];
 
         for (let i = 12; i >= 1; i--)
@@ -67,10 +68,29 @@ export default async function StatsPage() {
         return data;
     })()
 
-    const chartConfig = {
-        mobile: {
-            label: "Desktop",
-            color: "#2563eb",
+    const areaChartConfig = {
+        completion: {
+            label: "Completion %",
+            color: "var(--primary)",
+        },
+    } satisfies ChartConfig
+
+    const radarChartData = (() => {
+        let data: { icon: string, completion: number }[] = [];
+
+        for(const val of habits)
+                data.push({
+                icon: val.icon,
+                completion: completionRatePerRange(subDays(date, 7), 7, entries.filter(e => e.habitId === val.id), 1)
+            })
+
+        return data;
+    })()
+
+    const radarChartConfig = { 
+        completion: {
+            label: "Completion %",
+            color: "var(--primary)"
         },
     } satisfies ChartConfig
 
@@ -93,15 +113,21 @@ export default async function StatsPage() {
                 )}
             </div>
             <div className="flex flex-col lg:flex-row gap-4 w-full">
-                <div className="w-2/3 space-y-8 border rounded-lg p-6">
+                <div className="lg:w-2/3 space-y-8 border rounded-lg p-6">
                     <div className="">
                         <h2 className="font-medium">Week trend</h2>
-                        <p className="text-muted-foreground text-sm">Completion percent in rect weeks</p>
+                        <p className="text-muted-foreground text-sm">Completion percent in recent weeks</p>
                     </div>
-                    <WeekTrendAreaChart chartConfig={chartConfig} chartData={chartData} dataKeyChart="completion" dataKeyXAxis="date" />
+                    <CustomAreaChart chartConfig={areaChartConfig} chartData={areaChartData} dataKeyChart="completion" dataKeyXAxis="date" className="w-full max-h-75! max-sm:h-64!" />
+                </div>
+                <div className="lg:w-1/3 space-y-8 border rounded-lg p-6">
+                    <div className="">
+                        <h2 className="font-medium">Completion Rate per Habit</h2>
+                        <p className="text-muted-foreground text-sm">Completion percent per each habit this month</p>
+                    </div>
+                    <CustomRadarChart chartConfig={radarChartConfig} chartData={radarChartData} dataKeyChart="completion" labels="icon" className="mx-auto aspect-square max-h-62.5!" />
                 </div>
             </div>
-
         </>
     )
 }
