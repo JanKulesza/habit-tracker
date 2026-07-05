@@ -73,7 +73,7 @@ export default function HomePageClient({ userName, entries: se, habits: sh }: Ho
             <div className="flex flex-col sm:flex-row gap-4 justify-between items-center">
                 <div>
                     <h1 className="text-2xl font-medium">Hi, {userName} 👋</h1>
-                    <p className="text-sm text-muted-foreground">{format(new Date(), "eeee, d MMMM", { locale: pl })} · You have {habits.length - entriesToday.length} habits left today</p>
+                    <p className="text-sm text-muted-foreground">{format(new Date(), "eeee, d MMMM")} · You have {habits.length - entriesToday.length} habits left today</p>
                 </div>
                 <UpsertHabitBtn currentHabitsSnapshot={habits} onResult={setHabits}>
                     <Button className='p-5 px-8 w-full'> <Plus /> Add habit</Button>
