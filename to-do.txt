@@ -1,0 +1,4 @@
+Fix heat map activity history deleting after adding new habit
+Fix go back in habit details
+Fix streaks
+Replace divs in home to Card from shadcn
