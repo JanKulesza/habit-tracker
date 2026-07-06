@@ -60,12 +60,14 @@ export default async function StatsPage() {
             text: `${entries.length}`,
             description: "Total completions"
         },
-
     ]
+
+    // Area chart data describes weekly completion rate during AreaChartTimespan weeks time span
+    const AreaChartTimespan = 12 // weeks
     const areaChartData = (() => {
         let data: { date: string, completion: number }[] = [];
 
-        for (let i = 12; i >= 1; i--) // Keep in sync with the chart's footer description
+        for (let i = AreaChartTimespan; i >= 1; i--) // Keep in sync with the chart's footer description
             data.push({
                 date: format(subDays(startOfDay(date), 7 * i), "dd LLL"),
                 completion: completionRatePerRange(subDays(date, 7 * i), 7, entries, habits.length)
@@ -76,18 +78,28 @@ export default async function StatsPage() {
 
     const areaChartConfig = {
         completion: {
-            label: "Completion % per week",
+            label: "Completion ",
             color: "var(--primary)",
         },
     } satisfies ChartConfig
 
+    const areaChartDesc = areaChartData[areaChartData.length - 1].completion > areaChartData[areaChartData.length - 2].completion
+        ? <>
+            Trending up by <span className="font-semibold text-primary">{areaChartData[areaChartData.length - 1].completion - areaChartData[areaChartData.length - 2].completion}%</span> this month <TrendingUp className="h-4 w-4" />
+        </>
+        : <>
+            Trending down by <span className="font-semibold text-destructive">{areaChartData[areaChartData.length - 2].completion - areaChartData[areaChartData.length - 1].completion}%</span> this month <TrendingDown className="h-4 w-4 rotate-180" />
+        </>
+
+    // Radar chart, data represents completion rate per habit in the last 30 days
+    const RadarChartTimespan = 30 // days
     const radarChartData = (() => {
         let data: { name: string, completion: number }[] = [];
 
         for (const val of habits)
             data.push({
                 name: `${val.icon} ${val.name}`,
-                completion: completionRatePerRange(subDays(date, 7), 7, entries.filter(e => e.habitId === val.id), 1)
+                completion: completionRatePerRange(subDays(date, RadarChartTimespan), RadarChartTimespan, entries.filter(e => e.habitId === val.id), 1)
             })
 
         return data;
@@ -95,15 +107,17 @@ export default async function StatsPage() {
 
     const radarChartConfig = {
         completion: {
-            label: "Completion % per habit",
+            label: "Completion",
             color: "var(--primary)"
         },
     } satisfies ChartConfig
 
-    const entriesPerHabitLast30days = habits.map(h => ({
+    // Bar chart
+    const BarCharTimespan = 30 // days
+    const barChartData = habits.map(h => ({
         name: h.name,
         icon: h.icon,
-        entries: entries.filter(e => e.habitId === h.id && isAfter(e.date, subDays(date, 31))).length
+        entries: entries.filter(e => e.habitId === h.id && isAfter(e.date, subDays(date, BarCharTimespan + 1))).length
     }))
 
     const barChartConfig = {
@@ -112,6 +126,9 @@ export default async function StatsPage() {
             color: "var(--primary)"
         },
     } satisfies ChartConfig
+
+    const totalCompletionInLast30Days = barChartData.reduce((acc, val) => acc += val.entries, 0);
+    const rankedHabits = sort(radarChartData).desc(val => val.completion);
 
     return (
         <>
@@ -133,13 +150,14 @@ export default async function StatsPage() {
             </div>
             <div className="flex flex-col lg:flex-row gap-4 w-full">
                 <Card className="lg:w-2/3 pt-0">
-                    <CardHeader className="flex items-center gap-2 space-y-0 border-b py-5 sm:flex-row">
+                    <CardHeader className="flex items-center felx-col justify-between gap-2 space-y-0 border-b py-5 sm:flex-row">
                         <div className="grid flex-1 gap-1">
                             <CardTitle>Week trend</CardTitle>
                             <CardDescription>
-                                Completion percent in the last 12 weeks
+                                Completion percent in the last {AreaChartTimespan} weeks
                             </CardDescription>
                         </div>
+                        <div className="bg-primary/20 rounded-xl p-1 px-6 text-primary text-sm font-semibold">Currently at {areaChartData[areaChartData.length - 1].completion}%</div>
                     </CardHeader>
                     <CardContent className="px-2 pt-4 sm:px-6 sm:pt-6">
                         <CustomAreaChart chartConfig={areaChartConfig} chartData={areaChartData} dataKeyChart="completion" dataKeyXAxis="date" className="w-full max-h-75! max-sm:h-64!" />
@@ -147,18 +165,10 @@ export default async function StatsPage() {
                     <CardFooter className="h-24">
                         <div className="grid gap-2">
                             <div className="flex items-center gap-2 leading-none font-medium">
-                                {
-                                    areaChartData[areaChartData.length - 1].completion > areaChartData[areaChartData.length - 2].completion
-                                        ? <>
-                                            Trending up by <span className="font-semibold text-primary">{areaChartData[areaChartData.length - 1].completion - areaChartData[areaChartData.length - 2].completion}%</span> this month <TrendingUp className="h-4 w-4" />
-                                        </>
-                                        : <>
-                                            Trending down by <span className="font-semibold text-destructive">{areaChartData[areaChartData.length - 2].completion - areaChartData[areaChartData.length - 1].completion}%</span> this month <TrendingDown className="h-4 w-4 rotate-180" />
-                                        </>
-                                }
+                                {areaChartDesc}
                             </div>
                             <div className="flex items-center gap-2 leading-none text-muted-foreground">
-                                {format(subDays(date, 7 * 12), "dd LLL yyyy")} - {format(date, "dd LLL yyyy")}
+                                {format(subDays(date, 7 * AreaChartTimespan), "d LLL yyyy")} - {format(date, "d LLL yyyy")}
                             </div>
                         </div>
                     </CardFooter>
@@ -168,7 +178,7 @@ export default async function StatsPage() {
                         <div className="grid flex-1 gap-1">
                             <CardTitle>Completion Rate per Habit</CardTitle>
                             <CardDescription>
-                                Completion percent per each habit this month
+                                Completion percent per each habit in last {RadarChartTimespan} days
                             </CardDescription>
                         </div>
                     </CardHeader>
@@ -179,12 +189,11 @@ export default async function StatsPage() {
                         <div className="grid gap-2">
                             <div className="leading-none font-medium">
                                 <span className="font-semibold text-foreground">
-                                    {sort(radarChartData).desc((d) => d.completion)[0].name}
-                                </span> {" "}
-                                has the highest completion rate this month
+                                    {rankedHabits[rankedHabits.length -1].name}
+                                </span> has the lowest completion rate, sitting at <span className="font-semibold text-destructive">{rankedHabits[rankedHabits.length -1].completion}%</span>
                             </div>
                             <div className="text-muted-foreground">
-                                {format(date, "LLL yyyy")}
+                                {format(subDays(date, RadarChartTimespan), "d LLL yyyy")} - {format(date, "d LLL yyyy")}
                             </div>
                         </div>
                     </CardFooter>
@@ -194,31 +203,31 @@ export default async function StatsPage() {
                 <Card className="lg:w-1/2 h-fit">
                     <CardHeader>
                         <CardTitle>Habit Performance</CardTitle>
-                        <CardDescription>Number of completions by habit in the last 30 days</CardDescription>
+                        <CardDescription>Number of completions by habit in the last {BarCharTimespan} days</CardDescription>
                     </CardHeader>
                     <CardContent>
                         <ScrollArea className="h-96">
-                            <CustomBarChart chartConfig={barChartConfig} chartData={entriesPerHabitLast30days} dataKeyChart="entries" labels="icon" className="w-full" />
+                            <CustomBarChart chartConfig={barChartConfig} chartData={barChartData} dataKeyChart="entries" labels="icon" className="w-full" />
                             <ScrollBar orientation="vertical" />
                         </ScrollArea>
                     </CardContent>
                     <CardFooter className="flex-col items-start gap-2 text-sm">
                         <div className="leading-none font-medium">
-                            <span className="text-primary font-semibold">{entriesPerHabitLast30days.reduce((acc, val) => acc += val.entries, 0)} completions</span> recorded in the last 30 days.
+                            <span className="text-primary font-semibold">{totalCompletionInLast30Days} completions</span> recorded in the last {BarCharTimespan} days.
                         </div>
                         <div className="leading-none text-muted-foreground">
-                            Average of {(entriesPerHabitLast30days.reduce((acc, val) => acc += val.entries, 0) / 30).toFixed(1)} per day
+                            Average of {(totalCompletionInLast30Days / BarCharTimespan).toFixed(1)} per day
                         </div>
                     </CardFooter>
                 </Card>
                 <Card className="lg:w-1/2 h-fit">
                     <CardHeader>
                         <CardTitle>Habit ranking</CardTitle>
-                        <CardDescription>Ranked by completion rate over the last 30 days</CardDescription>
+                        <CardDescription>Ranked by completion rate over the last {RadarChartTimespan} days</CardDescription>
                     </CardHeader>
                     <CardContent>
                         <ScrollArea className="h-96">
-                            {sort(radarChartData).desc(val => val.completion).map((val, idx) => {
+                            {rankedHabits.map((val, idx) => {
                                 return (
                                     <Fragment key={idx}>
                                         <div className="flex justify-between items-center p-4 mb-2">
@@ -240,7 +249,7 @@ export default async function StatsPage() {
                     </CardContent>
                     <CardFooter className="flex-col items-start gap-2 text-sm">
                         <div className="flex gap-2 leading-none font-medium">
-                            {sort(radarChartData).desc((d) => d.completion)[0].name} remains the top-performing habit at <span className="text-primary font-semibold">{sort(radarChartData).desc((d) => d.completion)[0].completion}%</span>
+                            {rankedHabits[0].name} remains the top-performing habit at <span className="text-primary font-semibold">{rankedHabits[0].completion}%</span>
                         </div>
                         <div className="leading-none text-muted-foreground">
                             Higher completion rate means better consistency.

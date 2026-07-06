@@ -36,7 +36,29 @@ export default function CustomAreaChart({ chartData, chartConfig, dataKeyChart, 
                     axisLine={false}
                     tickMargin={8}
                 />
-                <ChartTooltip cursor={false} content={<ChartTooltipContent />} />
+                <ChartTooltip cursor={false} content={
+                    <ChartTooltipContent formatter={(value, name) => (
+                        <>
+                            <div
+                                className="h-2.5 w-2.5 shrink-0 rounded-[2px] bg-(--color-bg)"
+                                style={
+                                    {
+                                        "--color-bg": `var(--color-${name})`,
+                                    } as React.CSSProperties
+                                }
+                            />
+                            {chartConfig[name as keyof typeof chartConfig]?.label ||
+                                name}
+                            <div className="ml-auto flex items-baseline gap-0.5 font-mono font-medium text-foreground tabular-nums">
+                                {value}
+                                <span className="font-normal text-muted-foreground">
+                                    %
+                                </span>
+                            </div>
+                        </>
+                    )}
+                    />
+                } />
                 <defs>
                     <linearGradient id="fillGradient" x1="0" y1="0" x2="0" y2="1">
                         <stop

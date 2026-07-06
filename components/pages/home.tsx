@@ -113,7 +113,7 @@ export default function HomePageClient({ userName, entries: se, habits: sh }: Ho
                     </div>
                     {habits.map((hab, i) => {
                         const entryId = entriesToday.find(en => en.habitId === hab.id)?.id ?? null,
-                            streakYesterday = entriesThisWeek[format(subDays(new Date(), 1), 'yyyy-MM-dd')].find(en => en.habitId === hab.id)?.streak ?? 0
+                            streakYesterday = entriesThisWeek[format(subDays(new Date(), 1), 'yyyy-MM-dd')]?.find(en => en.habitId === hab.id)?.streak ?? 0
                         return <HabitBar
                             key={i}
                             habit={hab}
