@@ -150,7 +150,7 @@ export default async function StatsPage() {
             </div>
             <div className="flex flex-col lg:flex-row gap-4 w-full">
                 <Card className="lg:w-2/3 pt-0">
-                    <CardHeader className="flex items-center felx-col justify-between gap-2 space-y-0 border-b py-5 sm:flex-row">
+                    <CardHeader className="flex items-center flex-col justify-between gap-4 space-y-0 border-b py-5 sm:flex-row">
                         <div className="grid flex-1 gap-1">
                             <CardTitle>Week trend</CardTitle>
                             <CardDescription>
@@ -164,10 +164,10 @@ export default async function StatsPage() {
                     </CardContent>
                     <CardFooter className="h-24">
                         <div className="grid gap-2">
-                            <div className="flex items-center gap-2 leading-none font-medium">
+                            <div className="flex items-center gap-2  font-medium">
                                 {areaChartDesc}
                             </div>
-                            <div className="flex items-center gap-2 leading-none text-muted-foreground">
+                            <div className="flex items-center gap-2  text-muted-foreground">
                                 {format(subDays(date, 7 * AreaChartTimespan), "d LLL yyyy")} - {format(date, "d LLL yyyy")}
                             </div>
                         </div>
@@ -187,7 +187,7 @@ export default async function StatsPage() {
                     </CardContent>
                     <CardFooter className="h-24">
                         <div className="grid gap-2">
-                            <div className="leading-none font-medium">
+                            <div className=" font-medium">
                                 <span className="font-semibold text-foreground">
                                     {rankedHabits[rankedHabits.length -1].name}
                                 </span> has the lowest completion rate, sitting at <span className="font-semibold text-destructive">{rankedHabits[rankedHabits.length -1].completion}%</span>
@@ -206,16 +206,16 @@ export default async function StatsPage() {
                         <CardDescription>Number of completions by habit in the last {BarCharTimespan} days</CardDescription>
                     </CardHeader>
                     <CardContent>
-                        <ScrollArea className="h-96">
+                        <ScrollArea className="lg:h-80">
                             <CustomBarChart chartConfig={barChartConfig} chartData={barChartData} dataKeyChart="entries" labels="icon" className="w-full" />
                             <ScrollBar orientation="vertical" />
                         </ScrollArea>
                     </CardContent>
                     <CardFooter className="flex-col items-start gap-2 text-sm">
-                        <div className="leading-none font-medium">
+                        <div className=" font-medium">
                             <span className="text-primary font-semibold">{totalCompletionInLast30Days} completions</span> recorded in the last {BarCharTimespan} days.
                         </div>
-                        <div className="leading-none text-muted-foreground">
+                        <div className=" text-muted-foreground">
                             Average of {(totalCompletionInLast30Days / BarCharTimespan).toFixed(1)} per day
                         </div>
                     </CardFooter>
@@ -226,17 +226,17 @@ export default async function StatsPage() {
                         <CardDescription>Ranked by completion rate over the last {RadarChartTimespan} days</CardDescription>
                     </CardHeader>
                     <CardContent>
-                        <ScrollArea className="h-96">
+                        <ScrollArea className="lg:h-80">
                             {rankedHabits.map((val, idx) => {
                                 return (
                                     <Fragment key={idx}>
-                                        <div className="flex justify-between items-center p-4 mb-2">
+                                        <div className="flex justify-between items-center gap-2 px-0 py-4 sm:px-4 mb-2">
                                             <div className="flex items-center">
                                                 <span className="text-muted-foreground mr-4 text-sm">{idx + 1}</span>
                                                 {val.name}
                                             </div>
                                             <div className="flex items-center gap-4">
-                                                <ProgressU value={val.completion} className="w-32" max={100} />
+                                                <ProgressU value={val.completion} className="w-16 sm:w-32" max={100} />
                                                 <span className="text-muted-foreground mr-4">{val.completion}%</span>
                                             </div>
                                         </div>
@@ -248,10 +248,10 @@ export default async function StatsPage() {
                         </ScrollArea>
                     </CardContent>
                     <CardFooter className="flex-col items-start gap-2 text-sm">
-                        <div className="flex gap-2 leading-none font-medium">
-                            {rankedHabits[0].name} remains the top-performing habit at <span className="text-primary font-semibold">{rankedHabits[0].completion}%</span>
+                        <div className=" font-medium">
+                            <span className="font-semibold">{rankedHabits[0].name}</span> remains the top-performing habit at <span className="text-primary font-semibold">{rankedHabits[0].completion}%</span>
                         </div>
-                        <div className="leading-none text-muted-foreground">
+                        <div className=" text-muted-foreground">
                             Higher completion rate means better consistency.
                         </div>
                     </CardFooter>
