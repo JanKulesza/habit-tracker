@@ -14,15 +14,14 @@ import { useHandleCheck } from "@/lib/hooks/use-handle-check"
 interface HabitBoxProps {
     habit: Habit
     entryId: Entry['id'] | null
-    streakYesterday: number
+    streak: number
     currentEntriesSnapshot: Entry[]
     onResult: Dispatch<SetStateAction<Entry[]>>
 }
 
-export default function HabitBox({ habit, entryId, streakYesterday, currentEntriesSnapshot, onResult }: HabitBoxProps) {
-    const { isPending, isChecked, handleCheck } = useHandleCheck(currentEntriesSnapshot, onResult, habit.id, entryId, streakYesterday);
-    const streak = isChecked ? streakYesterday + 1 : streakYesterday,
-        date = new Date(),
+export default function HabitBox({ habit, entryId, streak, currentEntriesSnapshot, onResult }: HabitBoxProps) {
+    const { isPending, isChecked, handleCheck } = useHandleCheck(currentEntriesSnapshot, onResult, habit.id, entryId);
+    const date = new Date(),
         rgbColor = ICON_COLORS[habit.icon as Icon] ?? ICON_COLORS["default"];
 
     let entriesArr: {

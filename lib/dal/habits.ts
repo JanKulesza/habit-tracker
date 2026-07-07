@@ -61,6 +61,7 @@ export async function createHabit(formData: FormData): Promise<ServerActionRespo
                 goal: data.goal,
                 icon: data.icon,
                 userId: user.id,
+                createdAt: new Date()
             }
         })
         return { success: true, data: habit };

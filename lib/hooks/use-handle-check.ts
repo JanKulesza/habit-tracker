@@ -9,7 +9,6 @@ export const useHandleCheck = (
     onResult: Dispatch<SetStateAction<Entry[]>>,
     habitId: Habit['id'],
     entryId: Entry['id'] | null,
-    streakYesterday: number
 ) => {
     const [isPending, setIsPending] = useState(false)
 
@@ -24,7 +23,6 @@ export const useHandleCheck = (
                 id: mockId,
                 date: format(date, 'yyyy-MM-dd'),
                 habitId: habitId,
-                streak: streakYesterday + 1
             }])
         setIsPending(true);
 

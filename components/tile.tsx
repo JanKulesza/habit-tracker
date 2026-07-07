@@ -13,13 +13,12 @@ interface TileProps {
     isOutOfRange: boolean
     date: Date
     habitId: Habit['id']
-    streakYesterday: number
     onResult: Dispatch<SetStateAction<Entry[]>>
     currentEntriesSnapshot: Entry[]
 }
 
-export default function Tile({ entryId, day, isOutOfRange, date, habitId, streakYesterday, onResult, currentEntriesSnapshot }: TileProps) {
-    const { isPending, isChecked,  handleCheck } = useHandleCheck(currentEntriesSnapshot, onResult, habitId, entryId, streakYesterday);
+export default function Tile({ entryId, day, isOutOfRange, date, habitId, onResult, currentEntriesSnapshot }: TileProps) {
+    const { isPending, isChecked,  handleCheck } = useHandleCheck(currentEntriesSnapshot, onResult, habitId, entryId);
 
     return (
         <div

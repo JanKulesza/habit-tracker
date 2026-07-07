@@ -17,7 +17,6 @@ type WeekTilesProps =
     | {
         habitsNum?: 1
         habitId: Habit['id']
-        streakYesterday: number
         onResult: Dispatch<SetStateAction<Entry[]>>
         currentEntriesSnapshot: Entry[]
     };
@@ -81,7 +80,6 @@ export default function WeekTiles(props: WeekTilesProps) {
                         isOutOfRange={entry.ofr}
                         date={entry.date}
                         habitId={habitId}
-                        streakYesterday={0}
                         onResult={props.onResult}
                         currentEntriesSnapshot={props.currentEntriesSnapshot}
                     />

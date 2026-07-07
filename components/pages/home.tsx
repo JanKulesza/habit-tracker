@@ -4,10 +4,9 @@ import HabitBar from '../habit-bar';
 import InfoBox from '../info-box';
 import { ProgressU } from '../ui/progress-updated';
 import UpsertHabitBtn from '../upsert-habit-btn';
-import { formatEntriesByDate } from '@/lib/utils';
-import { endOfWeek, format, startOfWeek, subDays, subWeeks } from 'date-fns';
+import { formatEntriesByDate, getBestStreak, getStreakLog } from '@/lib/utils';
+import { endOfWeek, format, startOfWeek, subWeeks } from 'date-fns';
 import { pl } from 'date-fns/locale';
-import { sort } from 'fast-sort';
 import { Target, Flame, Medal, TrendingUp, Plus } from 'lucide-react';
 import { Entry, Habit } from '@/generated/prisma/client';
 import { useState } from 'react';
@@ -24,11 +23,11 @@ interface HomePageCientProps {
 export default function HomePageClient({ userName, entries: se, habits: sh }: HomePageCientProps) {
     const [entries, setEntries] = useState(se);
     const [habits, setHabits] = useState(sh);
-    const entriesThisWeek = formatEntriesByDate(entries, startOfWeek(new Date, { locale: pl })),
-        entriesToday = entriesThisWeek[format(new Date, "yyyy-MM-dd")];
+    const date = new Date(), formattedDate = format(date, "yyyy-MM-dd");
+    const entriesThisWeek = formatEntriesByDate(entries, startOfWeek(date, { locale: pl })),
+        entriesToday = entriesThisWeek[formattedDate];
 
     const progress = habits.length > 0 ? Number(((entriesToday.length ?? 0) * 100 / habits.length).toFixed()) : 0,
-        bestStreak = sort(entries).desc(e => e.streak)?.[0]?.streak ?? 0,
         trendWeek = (() => {
             let sum = 0, sumOfHabits = 0;
             for (const key in entriesThisWeek) {
@@ -36,7 +35,18 @@ export default function HomePageClient({ userName, entries: se, habits: sh }: Ho
                 sumOfHabits += habits.length
             }
             return sumOfHabits > 0 ? (sum * 100 / sumOfHabits).toFixed() : 0.00
-        })()
+        })();
+
+    const habitStreakLogs = new Map<Habit['id'], Map<string, number>>();
+    let runningStreaks = 0;
+    for (const h of habits) {
+        const streakLog = getStreakLog(h, entries);
+        if (streakLog.get(formattedDate) ?? 0 > 0)
+            runningStreaks++;
+        habitStreakLogs.set(h.id, streakLog);
+    }
+    const bestStreak = getBestStreak(habitStreakLogs);
+
     const infoBoxes = [
         {
             title: "Today",
@@ -49,7 +59,7 @@ export default function HomePageClient({ userName, entries: se, habits: sh }: Ho
             title: "Active streaks",
             icon: Flame,
             iconColor: "text-[#fa914a]",
-            text: `${entriesToday.filter(val => val.streak > 0).length ?? 0}`,
+            text: `${runningStreaks} ${runningStreaks === 1 ? "day" : "days"}`,
             description: "running streaks",
         },
         {
@@ -73,7 +83,7 @@ export default function HomePageClient({ userName, entries: se, habits: sh }: Ho
             <div className="flex flex-col sm:flex-row gap-4 justify-between items-center">
                 <div>
                     <h1 className="text-2xl font-medium">Hi, {userName} 👋</h1>
-                    <p className="text-sm text-muted-foreground">{format(new Date(), "eeee, d MMMM")} · You have {habits.length - entriesToday.length} habits left today</p>
+                    <p className="text-sm text-muted-foreground">{format(date, "eeee, d MMMM")} · You have {habits.length - entriesToday.length} habits left today</p>
                 </div>
                 <UpsertHabitBtn currentHabitsSnapshot={habits} onResult={setHabits}>
                     <Button className='p-5 px-8 w-full'> <Plus /> Add habit</Button>
@@ -111,14 +121,13 @@ export default function HomePageClient({ userName, entries: se, habits: sh }: Ho
                         <h2 className="font-medium">Habits today</h2>
                         <Link href="/habits" className="text-primary text-sm">See all</Link>
                     </div>
-                    {habits.map((hab, i) => {
-                        const entryId = entriesToday.find(en => en.habitId === hab.id)?.id ?? null,
-                            streakYesterday = entriesThisWeek[format(subDays(new Date(), 1), 'yyyy-MM-dd')]?.find(en => en.habitId === hab.id)?.streak ?? 0
+                    {habits.map((h, i) => {
+                        const entryId = entriesToday.find(en => en.habitId === h.id)?.id ?? null
                         return <HabitBar
-                            key={i}
-                            habit={hab}
+                            key={h.id}
+                            habit={h}
                             entryId={entryId}
-                            streakYesterday={streakYesterday}
+                            streak={habitStreakLogs.get(h.id)!.get(formattedDate)!}
                             onResult={setEntries}
                             currentEntriesSnapshot={entries}
                         />
@@ -134,7 +143,7 @@ export default function HomePageClient({ userName, entries: se, habits: sh }: Ho
                             <h2 className="font-medium">Activity</h2>
                             <p className="text-muted-foreground text-sm">Last 20 weeks</p>
                         </div>
-                        <HeatMap startDate={subWeeks(new Date(), 20)} endDate={endOfWeek(new Date(), { locale: pl })} entries={entries} habitsNum={habits.length} />
+                        <HeatMap startDate={subWeeks(date, 20)} endDate={endOfWeek(date, { locale: pl })} entries={entries} habitsNum={habits.length} />
                     </div>
                 </div>
             </div>

@@ -54,7 +54,8 @@ export default function UpsertHabitBtn({ currentHabitsSnapshot, onResult, habit,
             ...values,
             frequency: "daily", 
             id: habit ? habit.id : -Date.now(), 
-            userId: habit ? habit.userId : "mock" 
+            userId: habit ? habit.userId : "mock", 
+            createdAt: new Date()
         };
 
         try {

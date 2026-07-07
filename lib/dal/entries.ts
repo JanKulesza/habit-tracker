@@ -60,18 +60,10 @@ export async function createEntry(habitId: Habit['id'], date: Date): Promise<Ser
             return { success: false, error: "Entry already exists for this date" }
         }
 
-        const entryDayBefore = await prisma.entry.findFirst({
-            where: {
-                habitId,
-                date: format(subDays(date, 1), 'yyyy-MM-dd')
-            }
-        });
-
         const entry = await prisma.entry.create({
             data: {
                 habitId,
                 date: format(date, 'yyyy-MM-dd'),
-                streak: entryDayBefore ? entryDayBefore.streak + 1 : 1
             }
         });
 
@@ -102,24 +94,11 @@ export async function deleteEntry(entryId: Entry['id']): Promise<ServerActionRes
             return { success: false, error: "Entry not found" }
         }
 
-        const deletedEntry = await prisma.entry.delete({
+        await prisma.entry.delete({
             where: {
                 id: entryId
             }
         });
-        if (isBefore(deletedEntry.date, format(new Date(), 'yyyy-MM-dd'))) {
-            await prisma.entry.updateMany({
-                where: {
-                    habitId: deletedEntry.habitId,
-                    date: {
-                        gt: format(deletedEntry.date, 'yyyy-MM-dd')
-                    }
-                },
-                data: {
-                    streak: { decrement: 1 }
-                }
-            });
-        }
 
         return {
             success: true, data: null
