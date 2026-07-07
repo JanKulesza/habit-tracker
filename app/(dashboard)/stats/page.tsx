@@ -7,9 +7,10 @@ import { ChartConfig } from "@/components/ui/chart";
 import { ProgressU } from "@/components/ui/progress-updated";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
+import { Habit } from "@/generated/prisma/client";
 import { getEntriesForCurrentUser } from "@/lib/dal/entries";
 import { getHabitsForCurrentUser } from "@/lib/dal/habits";
-import { completionRatePerRange } from "@/lib/utils";
+import { completionRatePerRange, getBestStreak, getStreakLog } from "@/lib/utils";
 import { subDays, startOfDay, format, isAfter } from "date-fns";
 import { sort } from "fast-sort";
 import { TrendingUp, Flame, Medal, Check, TrendingDown } from "lucide-react";
@@ -26,10 +27,13 @@ export default async function StatsPage() {
     const date = new Date();
 
     const lastMonthCompletionRate = completionRatePerRange(subDays(date, 30), 30, entries, habits.length),
-        lastWeekCompletionRate = completionRatePerRange(subDays(date, 7), 7, entries, habits.length),
-        bestStreak = entries.reduce((acc, curr) =>
-            curr.streak > acc.streak ? { streak: curr.streak, name: curr.habitId } : acc,
-            { streak: 0, name: -1 });
+        lastWeekCompletionRate = completionRatePerRange(subDays(date, 7), 7, entries, habits.length);
+
+    const habitStreakLogs = new Map<Habit['id'], Map<string, number>>();
+    for (const h of habits) {
+        habitStreakLogs.set(h.id, getStreakLog(h, entries));
+    }
+    const bestStreak = getBestStreak(habitStreakLogs);
 
     const infoBoxes = [
         {
@@ -40,7 +44,7 @@ export default async function StatsPage() {
             description: "Completion rate"
         },
         {
-            title: "This week",
+            title: "Last week",
             icon: Flame,
             iconColor: "text-[#fa914a]",
             text: `${lastWeekCompletionRate}%`,
@@ -50,8 +54,8 @@ export default async function StatsPage() {
             title: "Best streak",
             icon: Medal,
             iconColor: "text-[#a176f1]",
-            text: `${bestStreak.streak} ${bestStreak.streak === 1 ? "day" : "days"}`,
-            description: `${habits.find(h => h.id === bestStreak.name)?.name ?? "Unknown habit"}`
+            text: `${bestStreak} ${bestStreak === 1 ? "day" : "days"}`,
+            description: "All-time record"
         },
         {
             title: "All-together",
@@ -189,8 +193,8 @@ export default async function StatsPage() {
                         <div className="grid gap-2">
                             <div className=" font-medium">
                                 <span className="font-semibold text-foreground">
-                                    {rankedHabits[rankedHabits.length -1].name}
-                                </span> has the lowest completion rate, sitting at <span className="font-semibold text-destructive">{rankedHabits[rankedHabits.length -1].completion}%</span>
+                                    {rankedHabits[rankedHabits.length - 1].name}
+                                </span> has the lowest completion rate, sitting at <span className="font-semibold text-destructive">{rankedHabits[rankedHabits.length - 1].completion}%</span>
                             </div>
                             <div className="text-muted-foreground">
                                 {format(subDays(date, RadarChartTimespan), "d LLL yyyy")} - {format(date, "d LLL yyyy")}

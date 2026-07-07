@@ -4,7 +4,7 @@ import { Icon, ICON_COLORS } from "@/lib/validations";
 import { useState } from "react";
 import { Button } from "../ui/button";
 import { format, startOfDay, startOfWeek, subDays, subYears } from "date-fns";
-import { formatEntriesByDate } from "@/lib/utils";
+import { formatEntriesByDate, getBestStreak, getStreakLog } from "@/lib/utils";
 import { pl } from "date-fns/locale";
 import { Calendar, Check, Edit, Flame, Medal, Target } from "lucide-react";
 import { useHandleCheck } from "@/lib/hooks/use-handle-check";
@@ -23,12 +23,12 @@ export default function HabitDetailsClientPage({ habit: h, habitEntries }: Habit
     const [habit, setHabit] = useState(h);
     const [entries, setEntries] = useState(habitEntries); // Entries for this habit only
     const date = new Date(),
+        formattedDate = format(date, 'yyyy-MM-dd'),
         entriesThisWeek = formatEntriesByDate(entries, startOfWeek(date, { locale: pl })),
-        entryId = entriesThisWeek[format(date, 'yyyy-MM-dd')]?.[0]?.id ?? null,
-        streakYesterday = entriesThisWeek[format(subDays(date, 1), 'yyyy-MM-dd')]?.[0]?.streak ?? 0,
+        entryId = entriesThisWeek[formattedDate]?.[0]?.id ?? null,
         rgbColor = ICON_COLORS[habit.icon as Icon] ?? ICON_COLORS["default"];
 
-    const { isPending, isChecked, handleCheck } = useHandleCheck(entries, setEntries, habit.id, entryId, streakYesterday);
+    const { isPending, isChecked, handleCheck } = useHandleCheck(entries, setEntries, habit, entryId);
 
     const last30DaysPercent = (() => {
         let daysDone = 0;
@@ -41,15 +41,18 @@ export default function HabitDetailsClientPage({ habit: h, habitEntries }: Habit
         }
 
         return (daysDone * 100) / 30;
-    })().toFixed(0),
-        bestStreak = entries.reduce((acc, curr) => curr.streak > acc ? curr.streak : acc, 0);
+    })().toFixed(0);
+
+    const habitStreakLog = getStreakLog(habit, entries);
+    const bestStreak = getBestStreak(new Map<Habit['id'], Map<string, number>>([[habit.id, habitStreakLog]])),
+        currentStreak = habitStreakLog.get(formattedDate);
 
     const infoBoxes = [
         {
             title: "Current streak",
             icon: Flame,
             iconColor: "text-[#fa914a]",
-            text: `${entriesThisWeek[format(date, 'yyyy-MM-dd')]?.[0]?.streak ?? 0}`,
+            text: `${currentStreak} ${currentStreak === 1 ? "day" : "days"}`,
             description: "runs nonstop",
         },
         {
@@ -121,9 +124,8 @@ export default function HabitDetailsClientPage({ habit: h, habitEntries }: Habit
                 <h2 className="font-medium">This week</h2>
                 <WeekTiles
                     currentEntriesSnapshot={entries}
-                    habitId={habit.id}
+                    habit={habit}
                     onResult={setEntries}
-                    streakYesterday={streakYesterday}
                 />
             </div>
             <div className='space-y-8'>
@@ -136,7 +138,7 @@ export default function HabitDetailsClientPage({ habit: h, habitEntries }: Habit
                         startDate={subYears(date, 1)}
                         endDate={date}
                         entries={entries}
-                        habitsNum={1}
+                        habitsCreationDates={[habit.createdAt]}
                     />
                 </div>
             </div>

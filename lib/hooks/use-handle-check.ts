@@ -1,19 +1,22 @@
 import { Entry, Habit } from "@/generated/prisma/client";
 import { Dispatch, SetStateAction, useState } from "react";
 import { switchEntry } from "../dal/entries";
-import { format } from "date-fns";
+import { format,  isBefore, startOfDay } from "date-fns";
 import { toast } from "sonner";
 
 export const useHandleCheck = (
     currentEntriesSnapshot: Entry[],
     onResult: Dispatch<SetStateAction<Entry[]>>,
-    habitId: Habit['id'],
+    habit: Habit,
     entryId: Entry['id'] | null,
-    streakYesterday: number
 ) => {
     const [isPending, setIsPending] = useState(false)
 
     const handleCheck = async (date: Date = new Date()) => {
+        console.log(date, habit.createdAt);
+        
+        if(isPending || isBefore(date, startOfDay(habit.createdAt)))
+            return;
         const snapshot = [...currentEntriesSnapshot],
             mockId = -Date.now();
         
@@ -23,13 +26,12 @@ export const useHandleCheck = (
             onResult([...currentEntriesSnapshot, {
                 id: mockId,
                 date: format(date, 'yyyy-MM-dd'),
-                habitId: habitId,
-                streak: streakYesterday + 1
+                habitId: habit.id,
             }])
         setIsPending(true);
 
         try {
-            const res = await switchEntry(habitId, date);
+            const res = await switchEntry(habit.id, date);
 
             if (!res?.success) {
                 toast.error(res.error);

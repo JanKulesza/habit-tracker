@@ -15,9 +15,6 @@ export const googleSignIn = async () => {
     provider: "google",
     callbackURL: "/",
     fetchOptions: {
-      onSuccess: () => {
-        toast.success("Signed in successfully.");
-      },
       onError: (context) => {
         console.error("BETTER AUTH GOOGLE ERROR: ", context.error);
         toast.error(context.error.message ?? "Internal server error.");

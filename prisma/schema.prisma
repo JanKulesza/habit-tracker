@@ -82,6 +82,7 @@ model Habit {
   userId    String
   user      User    @relation(fields: [userId], references: [id], onDelete: Cascade)
   entries   Entry[]
+  createdAt  DateTime @db.Timestamptz(3)
 
   @@map("habit")
 }
@@ -89,7 +90,6 @@ model Habit {
 model Entry {
   id      Int      @id @default(autoincrement())
   date    String  // Date provided by the user in format YYYY-MM-DD
-  streak  Int      @default(1)
   habitId Int
   habit   Habit    @relation(fields: [habitId], references: [id], onDelete: Cascade)
 
