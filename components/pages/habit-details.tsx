@@ -28,7 +28,7 @@ export default function HabitDetailsClientPage({ habit: h, habitEntries }: Habit
         entryId = entriesThisWeek[formattedDate]?.[0]?.id ?? null,
         rgbColor = ICON_COLORS[habit.icon as Icon] ?? ICON_COLORS["default"];
 
-    const { isPending, isChecked, handleCheck } = useHandleCheck(entries, setEntries, habit.id, entryId);
+    const { isPending, isChecked, handleCheck } = useHandleCheck(entries, setEntries, habit, entryId);
 
     const last30DaysPercent = (() => {
         let daysDone = 0;
@@ -124,7 +124,7 @@ export default function HabitDetailsClientPage({ habit: h, habitEntries }: Habit
                 <h2 className="font-medium">This week</h2>
                 <WeekTiles
                     currentEntriesSnapshot={entries}
-                    habitId={habit.id}
+                    habit={habit}
                     onResult={setEntries}
                 />
             </div>
@@ -138,7 +138,7 @@ export default function HabitDetailsClientPage({ habit: h, habitEntries }: Habit
                         startDate={subYears(date, 1)}
                         endDate={date}
                         entries={entries}
-                        habitsNum={1}
+                        habitsCreationDates={[habit.createdAt]}
                     />
                 </div>
             </div>

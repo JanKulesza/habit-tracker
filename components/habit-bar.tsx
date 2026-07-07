@@ -15,7 +15,7 @@ interface HabitBarProps {
 }
 
 export default function HabitBar({ habit, entryId, streak, onResult, currentEntriesSnapshot }: HabitBarProps) {
-    const { isPending, isChecked, handleCheck } = useHandleCheck(currentEntriesSnapshot, onResult, habit.id, entryId);
+    const { isPending, isChecked, handleCheck } = useHandleCheck(currentEntriesSnapshot, onResult, habit, entryId);
     
     return (
         <div className='flex py-4 items-center border-b gap-4'>

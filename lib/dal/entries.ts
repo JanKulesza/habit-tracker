@@ -3,7 +3,7 @@ import { prisma } from "../prisma"
 import { ServerActionResponse } from "../types/response"
 import { requireSession } from "./session"
 import { Entry, Habit } from "@/generated/prisma/browser"
-import { format, isAfter, isBefore, subDays } from "date-fns"
+import { format, isAfter, isBefore, startOfDay } from "date-fns"
 import { cache } from "react"
 
 export const getEntriesForCurrentUser = cache(async (habitId?: Habit['id']): Promise<ServerActionResponse<Entry[]>> => {
@@ -47,6 +47,10 @@ export async function createEntry(habitId: Habit['id'], date: Date): Promise<Ser
 
         if (!habit) {
             return { success: false, error: "Habit not found" }
+        }
+
+        if(isBefore(date, startOfDay(habit.createdAt))) {
+            return { success: false, error: "Unable to create an entry before habit creation day." }
         }
 
         const existingEntry = await prisma.entry.findFirst({

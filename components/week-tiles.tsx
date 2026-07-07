@@ -11,18 +11,18 @@ import Tile from "./tile";
 type WeekTilesProps =
     | {
         habitsNum: number
-        habitId: null
+        habit?: null
         currentEntriesSnapshot: Entry[]
     }
     | {
         habitsNum?: 1
-        habitId: Habit['id']
+        habit: Habit
         onResult: Dispatch<SetStateAction<Entry[]>>
         currentEntriesSnapshot: Entry[]
     };
 
 export default function WeekTiles(props: WeekTilesProps) {
-    const { habitsNum, habitId } = props,
+    const { habitsNum, habit } = props,
         entriesThisWeek = formatEntriesByDate(props.currentEntriesSnapshot, startOfWeek(new Date(), { locale: pl }));
     let entriesArr: {
         date: Date,
@@ -37,11 +37,11 @@ export default function WeekTiles(props: WeekTilesProps) {
         if (entriesThisDay && entriesThisDay.length > 0)
             entriesArr.push({
                 date: i,
-                entryId: habitId ? entriesThisDay.find(val => val.habitId === habitId)?.id ?? null : null,
+                entryId: habit ? entriesThisDay.find(val => val.habitId === habit.id)?.id ?? null : null,
                 day: format(i, 'EEEEEE'),
-                checked: !habitId
+                checked: !habit
                     ? entriesThisDay.length === habitsNum
-                    : entriesThisDay.some(val => val.habitId === habitId),
+                    : entriesThisDay.some(val => val.habitId === habit.id),
                 ofr: false
             })
         else
@@ -59,7 +59,7 @@ export default function WeekTiles(props: WeekTilesProps) {
         <ScrollArea>
             <div className="flex gap-2 p-1">
                 {entriesArr.map((entry, i) => {
-                    if (!habitId)
+                    if (!habit)
                         return (
                             <div
                                 key={i}
@@ -79,7 +79,7 @@ export default function WeekTiles(props: WeekTilesProps) {
                         day={entry.day}
                         isOutOfRange={entry.ofr}
                         date={entry.date}
-                        habitId={habitId}
+                        habit={habit}
                         onResult={props.onResult}
                         currentEntriesSnapshot={props.currentEntriesSnapshot}
                     />

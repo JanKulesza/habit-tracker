@@ -136,14 +136,14 @@ export default function HomePageClient({ userName, entries: se, habits: sh }: Ho
                 <div className='space-y-8 lg:w-2/5'>
                     <div className='w-full space-y-4 border rounded-lg p-6'>
                         <h2 className="font-medium">This week</h2>
-                        <WeekTiles currentEntriesSnapshot={entries} habitsNum={habits.length} habitId={null} />
+                        <WeekTiles currentEntriesSnapshot={entries} habitsNum={habits.length} />
                     </div>
                     <div className="w-full space-y-4 border rounded-lg p-6">
                         <div className="flex justify-between items-center">
                             <h2 className="font-medium">Activity</h2>
                             <p className="text-muted-foreground text-sm">Last 20 weeks</p>
                         </div>
-                        <HeatMap startDate={subWeeks(date, 20)} endDate={endOfWeek(date, { locale: pl })} entries={entries} habitsNum={habits.length} />
+                        <HeatMap startDate={subWeeks(date, 20)} endDate={endOfWeek(date, { locale: pl })} entries={entries} habitsCreationDates={habits.map(val => val.createdAt)} />
                     </div>
                 </div>
             </div>

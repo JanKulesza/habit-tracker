@@ -8,10 +8,10 @@ interface HeatMapProps {
     startDate: Date
     endDate: Date
     entries: Entry[]
-    habitsNum: number
+    habitsCreationDates: Date[]
 }
 
-export default function HeatMap({ startDate, endDate, entries, habitsNum }: HeatMapProps) {
+export default function HeatMap({ startDate, endDate, entries, habitsCreationDates }: HeatMapProps) {
     startDate = startOfWeek(startDate, { locale: pl });
     endDate = endOfWeek(endDate, { locale: pl })
     const entriesInPeriod = formatEntriesByDate(entries, startDate)
@@ -21,6 +21,10 @@ export default function HeatMap({ startDate, endDate, entries, habitsNum }: Heat
     }[] = [];
 
     for (let i = startDate; isBefore(i, endDate); i = addDays(i, 1)) {
+        let habitsNum = 0;
+        for(const date of habitsCreationDates) 
+            habitsNum += isBefore(date, i) ? 1 : 0;
+        
         const entriesThisDay = entriesInPeriod[format(i, 'yyyy-MM-dd')]
         if (entriesThisDay && entriesThisDay.length > 0)
             entriesArr.push({

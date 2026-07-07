@@ -20,7 +20,7 @@ interface HabitBoxProps {
 }
 
 export default function HabitBox({ habit, entryId, streak, currentEntriesSnapshot, onResult }: HabitBoxProps) {
-    const { isPending, isChecked, handleCheck } = useHandleCheck(currentEntriesSnapshot, onResult, habit.id, entryId);
+    const { isPending, isChecked, handleCheck } = useHandleCheck(currentEntriesSnapshot, onResult, habit, entryId);
     const date = new Date(),
         rgbColor = ICON_COLORS[habit.icon as Icon] ?? ICON_COLORS["default"];
 
