@@ -60,8 +60,12 @@ CREATE TABLE "verification" (
 -- CreateTable
 CREATE TABLE "habit" (
     "id" SERIAL NOT NULL,
+    "icon" TEXT NOT NULL,
     "name" TEXT NOT NULL,
+    "goal" TEXT NOT NULL,
+    "frequency" TEXT NOT NULL DEFAULT 'daily',
     "userId" TEXT NOT NULL,
+    "createdAt" TIMESTAMPTZ(3) NOT NULL,
 
     CONSTRAINT "habit_pkey" PRIMARY KEY ("id")
 );
@@ -69,7 +73,7 @@ CREATE TABLE "habit" (
 -- CreateTable
 CREATE TABLE "entry" (
     "id" SERIAL NOT NULL,
-    "date" DATE NOT NULL,
+    "date" TEXT NOT NULL,
     "habitId" INTEGER NOT NULL,
 
     CONSTRAINT "entry_pkey" PRIMARY KEY ("id")

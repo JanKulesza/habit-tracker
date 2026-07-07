@@ -1,3 +1,0 @@
--- AlterTable
-ALTER TABLE "entry" ALTER COLUMN "date" SET DATA TYPE TEXT,
-ALTER COLUMN "streak" SET DEFAULT 1;
