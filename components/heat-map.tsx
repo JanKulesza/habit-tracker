@@ -1,6 +1,6 @@
 import { Entry } from '@/generated/prisma/client'
 import { formatEntriesByDate } from '@/lib/utils'
-import { addDays, endOfWeek, format, isBefore, startOfWeek } from 'date-fns'
+import { addDays, endOfWeek, format, isBefore, startOfDay, startOfWeek } from 'date-fns'
 import { pl } from 'date-fns/locale'
 import { ScrollArea, ScrollBar } from './ui/scroll-area'
 
@@ -22,9 +22,9 @@ export default function HeatMap({ startDate, endDate, entries, habitsCreationDat
 
     for (let i = startDate; isBefore(i, endDate); i = addDays(i, 1)) {
         let habitsNum = 0;
-        for(const date of habitsCreationDates) 
-            habitsNum += isBefore(date, i) ? 1 : 0;
-        
+        for (const createdAt of habitsCreationDates)
+            habitsNum += !isBefore(i, startOfDay(createdAt)) ? 1 : 0;
+
         const entriesThisDay = entriesInPeriod[format(i, 'yyyy-MM-dd')]
         if (entriesThisDay && entriesThisDay.length > 0)
             entriesArr.push({
@@ -50,7 +50,7 @@ export default function HeatMap({ startDate, endDate, entries, habitsCreationDat
             <ScrollArea className='w-full overflow-x-auto'>
                 <div className='flex gap-1 mb-2'>
                     {entriesArr.map((_, idx) => {
-                        if(idx % 7 !== 0)
+                        if (idx % 7 !== 0)
                             return
 
                         if (idx >= 7 && idx % 7 === 0 && entriesArr[idx].date.getMonth() != entriesArr[idx - 7].date.getMonth()
@@ -65,7 +65,7 @@ export default function HeatMap({ startDate, endDate, entries, habitsCreationDat
                         <div key={idx} className={`rounded-[3px] w-3 h-3 ${checked ? 'bg-primary' : 'bg-muted'}`} />
                     )}
                 </div>
-                 <ScrollBar orientation="horizontal" />
+                <ScrollBar orientation="horizontal" />
             </ScrollArea>
         </div>
 
