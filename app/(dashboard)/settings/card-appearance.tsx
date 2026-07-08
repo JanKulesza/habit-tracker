@@ -25,7 +25,7 @@ const AppearanceCard = () => {
                 <Switch
                     onCheckedChange={() => setTheme(resolvedTheme === "dark" ? "light" : "dark")}
                     checked={resolvedTheme === "dark"}
-                    className='cursor-pointer w-full'
+                    className='cursor-pointer'
                 />
             </CardContent>
         </Card>
