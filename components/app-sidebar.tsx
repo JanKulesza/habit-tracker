@@ -1,4 +1,4 @@
-import { ChartColumn, Home, ListTodo, Settings, Zap } from "lucide-react";
+import { ChartColumn, Home, ListTodo, LogOutIcon, Settings, Zap } from "lucide-react";
 import { SidebarHeader, SidebarContent, SidebarFooter, Sidebar } from "./ui/sidebar";
 import AppSidebarBtn from "./buttons/app-sidebar-btn";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
@@ -85,7 +85,9 @@ export default async function AppSidebar() {
                         </TooltipContent>
                     </Tooltip>
                 </div>
-                <SignOutBtn className="w-9 h-9 cursor-pointer z-10 transition-all duration-300 ease-in-out" />
+                <SignOutBtn className="w-9 h-9 cursor-pointer z-10 transition-all duration-300 ease-in-out">
+                    <LogOutIcon />
+                </SignOutBtn>
             </SidebarFooter>
         </Sidebar>
     )

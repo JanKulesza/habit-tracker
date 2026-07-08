@@ -1,11 +1,16 @@
 "use client"
-import { LogOutIcon } from 'lucide-react'
+
 import { Button } from '../ui/button'
 import { authClient } from '@/lib/auth-client';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 
-export default function SignOutBtn({ className }: { className?: string }) {
+interface SignOutBtnProps {
+  children: React.ReactNode
+  className?: string
+}
+
+export default function SignOutBtn({ className, children }: SignOutBtnProps) {
   const router = useRouter();
   const handleSignOut = async () => {
     await authClient.signOut({
@@ -23,7 +28,7 @@ export default function SignOutBtn({ className }: { className?: string }) {
 
   return (
     <Button className={className} variant="destructive" onClick={handleSignOut}>
-      <LogOutIcon />
+      {children}
     </Button>
   )
 }
