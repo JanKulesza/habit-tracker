@@ -1,11 +1,11 @@
 "use client"
 
 import { useState } from 'react'
-import { Card, CardContent, CardHeader } from './ui/card'
-import { AvatarImage, AvatarFallback, Avatar } from './ui/avatar'
+import { Card, CardContent, CardHeader } from '../../../components/ui/card'
+import { AvatarImage, AvatarFallback, Avatar } from '../../../components/ui/avatar'
 import { format } from 'date-fns'
 import { User } from '@/generated/prisma/client'
-import EditProfileBtn from './buttons/edit-profile'
+import EditProfileBtn from '../../../components/buttons/edit-profile'
 
 const ProfileCard = ({ user: u }: { user: User }) => {
     const [user, setUser] = useState(u)
