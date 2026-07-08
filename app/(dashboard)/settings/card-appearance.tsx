@@ -13,7 +13,7 @@ const AppearanceCard = () => {
             <CardHeader className="font-medium text-lg">
                 Appearance
             </CardHeader>
-            <CardContent className='flex flex-col sm:flex-row gap-4 sm:justify-between sm:items-center'>
+            <CardContent className='flex gap-4 justify-between items-center'>
                 <div className="flex gap-4 items-center">
                     <Sun className="h-[1.2rem] w-[1.2rem] scale-100 rotate-0 transition-all dark:scale-0 dark:-rotate-90" />
                     <Moon className="absolute h-[1.2rem] w-[1.2rem] scale-0 rotate-90 transition-all dark:scale-100 dark:rotate-0" />
@@ -25,7 +25,7 @@ const AppearanceCard = () => {
                 <Switch
                     onCheckedChange={() => setTheme(resolvedTheme === "dark" ? "light" : "dark")}
                     checked={resolvedTheme === "dark"}
-                    className='cursor-pointer'
+                    className='cursor-pointer w-full'
                 />
             </CardContent>
         </Card>

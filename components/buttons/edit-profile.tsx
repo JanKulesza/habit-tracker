@@ -21,7 +21,6 @@ interface EditProfileBtnProps {
 
 export default function EditProfileBtn({ user, onResult }: EditProfileBtnProps) {
     const [open, setOpen] = useState(false);
-    const router = useRouter();
     const form = useForm<UserSchema>({
         resolver: zodResolver(userSchema),
         defaultValues: {
@@ -63,7 +62,7 @@ export default function EditProfileBtn({ user, onResult }: EditProfileBtnProps) 
             <FormProvider {...form}>
                 <form id="add-habit-form" onSubmit={form.handleSubmit(onSubmit)} className='sm:w-auto w-full'>
                     <DialogTrigger asChild>
-                        <Button variant="outline" size="lg">
+                        <Button variant="outline" size="lg" className='w-full'>
                             <Edit /> Edit profile
                         </Button>
                     </DialogTrigger>
