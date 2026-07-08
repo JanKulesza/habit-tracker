@@ -3,7 +3,7 @@ import Link from 'next/link';
 import HabitBar from '../habit-bar';
 import InfoBox from '../info-box';
 import { ProgressU } from '../ui/progress-updated';
-import UpsertHabitBtn from '../upsert-habit-btn';
+import UpsertHabitBtn from '../buttons/upsert-habit-btn';
 import { formatEntriesByDate, getBestStreak, getStreakLog } from '@/lib/utils';
 import { endOfWeek, format, startOfWeek, subWeeks } from 'date-fns';
 import { pl } from 'date-fns/locale';

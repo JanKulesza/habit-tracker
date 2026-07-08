@@ -1,6 +1,6 @@
 "use client"
 import { LogOutIcon } from 'lucide-react'
-import { Button } from './ui/button'
+import { Button } from '../ui/button'
 import { authClient } from '@/lib/auth-client';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';

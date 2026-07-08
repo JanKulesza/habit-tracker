@@ -2,7 +2,7 @@
 import { Entry, Habit } from '@/generated/prisma/client'
 import { format, subDays } from 'date-fns';
 import { useState } from 'react'
-import UpsertHabitBtn from '../upsert-habit-btn';
+import UpsertHabitBtn from '../buttons/upsert-habit-btn';
 import HabitBox from '../habit-box';
 import { Button } from '../ui/button';
 import { Plus } from 'lucide-react';

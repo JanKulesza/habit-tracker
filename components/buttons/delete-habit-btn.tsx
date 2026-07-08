@@ -1,7 +1,7 @@
 "use client"
 
 import { Habit } from "@/generated/prisma/client"
-import { Button } from "./ui/button"
+import { Button } from "../ui/button"
 import { Trash2 } from "lucide-react"
 import {
     AlertDialog,
@@ -17,7 +17,7 @@ import {
 import { useState } from "react"
 import { deleteHabit } from "@/lib/dal/habits"
 import { toast } from "sonner"
-import { Spinner } from "./ui/spinner"
+import { Spinner } from "../ui/spinner"
 import { useRouter } from "next/navigation"
 
 interface DeleteHabitBtnProps {
