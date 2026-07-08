@@ -11,8 +11,8 @@ import { useHandleCheck } from "@/lib/hooks/use-handle-check";
 import WeekTiles from "../week-tiles";
 import InfoBox from "../info-box";
 import HeatMap from "../heat-map";
-import UpsertHabitBtn from "../upsert-habit-btn";
-import DeleteHabitBtn from "../delete-habit-btn";
+import UpsertHabitBtn from "../buttons/upsert-habit-btn";
+import DeleteHabitBtn from "../buttons/delete-habit-btn";
 
 interface HabitDetailsClientPageProps {
     habit: Habit

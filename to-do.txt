@@ -1,3 +1,4 @@
 Replace divs in home to Card from shadcn
 Refactor code, add memoization
-Add settings
+Change disabled habit switch btn
+fix callback url in better auth

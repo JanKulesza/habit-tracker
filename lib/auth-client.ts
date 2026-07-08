@@ -1,4 +1,3 @@
-import { isAPIError } from "better-auth/api";
 import { createAuthClient } from "better-auth/react"
 import { toast } from "sonner";
 import { LoginSchema, RegisterSchema } from "./validations";
@@ -50,3 +49,30 @@ export const credentialsLogin = async (values: LoginSchema) => {
 
   toast.success("Logged in successfully.");
 };
+
+export const signOut = async () => {
+  const { error } = await authClient.signOut({
+    fetchOptions: {
+      onSuccess: () => {
+        toast.success("Signed out successfully.")
+      },
+    },
+  });
+
+  if (error) {
+    toast.error(error.message ?? "Internal server error.")
+    return;
+  }
+}
+
+export const deleteUser = async () => {
+  const { error } = await authClient.deleteUser();
+
+  if (error) {
+    toast.error(error.message ?? "Internal server error.")
+    return;
+  }
+
+  toast.success("Account deleted successfully.")
+}
+

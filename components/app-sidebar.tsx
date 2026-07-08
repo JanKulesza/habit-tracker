@@ -1,8 +1,8 @@
-import { ChartColumn, Home, ListTodo, Settings, Zap } from "lucide-react";
+import { ChartColumn, Home, ListTodo, LogOutIcon, Settings, Zap } from "lucide-react";
 import { SidebarHeader, SidebarContent, SidebarFooter, Sidebar } from "./ui/sidebar";
-import AppSidebarBtn from "./app-sidebar-btn";
+import AppSidebarBtn from "./buttons/app-sidebar-btn";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
-import SignOutBtn from "./sign-out-btn";
+import SignOutBtn from "./buttons/sign-out-btn";
 import { TooltipTrigger, TooltipContent, Tooltip } from "./ui/tooltip";
 import { requireSession } from "@/lib/dal/session";
 
@@ -66,7 +66,7 @@ export default async function AppSidebar() {
                             alt="profile image"
                             className="grayscale"
                         />
-                        <AvatarFallback>CN</AvatarFallback>
+                        <AvatarFallback>{user.name.slice(0,2).toUpperCase()}</AvatarFallback>
                     </Avatar>
                     <Tooltip>
                         <TooltipTrigger asChild>
@@ -85,7 +85,9 @@ export default async function AppSidebar() {
                         </TooltipContent>
                     </Tooltip>
                 </div>
-                <SignOutBtn className="w-9 h-9 cursor-pointer z-10 transition-all duration-300 ease-in-out" />
+                <SignOutBtn className="w-9 h-9 cursor-pointer z-10 transition-all duration-300 ease-in-out">
+                    <LogOutIcon />
+                </SignOutBtn>
             </SidebarFooter>
         </Sidebar>
     )

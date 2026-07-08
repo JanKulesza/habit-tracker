@@ -4,7 +4,7 @@ import { prisma } from "./prisma";
 import { ZodObject } from "zod";
 import { loginSchema, registerSchema } from "./validations";
 import { APIError } from "better-auth/api";
-import type { HookEndpointContext } from "better-auth"; 
+import type { HookEndpointContext } from "better-auth";
 import { formatZodErrors } from "./utils";
 
 if (!process.env["AUTH_GOOGLE_ID"] || !process.env["AUTH_GOOGLE_SECRET"])
@@ -19,7 +19,7 @@ export const auth = betterAuth({
         hooks: {
             before: async (request: HookEndpointContext) => {
                 let validator: ZodObject = loginSchema;
-                if(!request.path) 
+                if (!request.path)
                     throw new APIError("INTERNAL_SERVER_ERROR", {
                         message: "No path provided."
                     });
@@ -31,11 +31,11 @@ export const auth = betterAuth({
                     ...request.body
                 })
 
-                if (!success) 
+                if (!success)
                     throw new APIError("BAD_REQUEST", {
                         message: `Validation Error: ${formatZodErrors(error)}`
                     });
-                
+
             }
         }
     },
@@ -52,6 +52,9 @@ export const auth = betterAuth({
                 required: true,
                 defaultValue: true
             }
+        },
+        deleteUser: {
+            enabled: true
         }
     }
 });
