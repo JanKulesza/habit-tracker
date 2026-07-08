@@ -6,10 +6,7 @@ import { Moon, Sun } from 'lucide-react'
 import { Switch } from '@/components/ui/switch'
 
 const AppearanceCard = () => {
-    const { theme, setTheme, systemTheme } = useTheme()
-
-    if(theme === "system")
-        setTheme(systemTheme === 'dark' ? 'dark' : 'light');
+    const { setTheme, resolvedTheme } = useTheme()
 
     return (
         <Card className='py-5'>
@@ -25,7 +22,11 @@ const AppearanceCard = () => {
                         <p className='text-muted-foreground text-xs'>Switch between dark and light mode</p>
                     </div>
                 </div>
-                <Switch onClick={() => setTheme(theme === "dark" ? "light" : "dark")} checked={theme === "dark"} className='cursor-pointer'  />
+                <Switch
+                    onCheckedChange={() => setTheme(resolvedTheme === "dark" ? "light" : "dark")}
+                    checked={resolvedTheme === "dark"}
+                    className='cursor-pointer'
+                />
             </CardContent>
         </Card>
     )
