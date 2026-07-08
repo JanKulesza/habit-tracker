@@ -5,7 +5,8 @@ import AppearanceCard from "./card-appearance";
 import { Card, CardHeader, CardContent } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import SignOutBtn from "@/components/buttons/sign-out-btn";
-import { LogOutIcon } from "lucide-react";
+import { LogOutIcon, Trash2 } from "lucide-react";
+import DeleteAccountBtn from "@/components/buttons/delete-account-btn";
 
 export default async function SettingsPage() {
   const { user } = await requireSession();
@@ -22,15 +23,25 @@ export default async function SettingsPage() {
         <CardHeader className="font-medium text-lg text-destructive">
           Danger zone
         </CardHeader>
-        <CardContent className="space-y-2">
+        <CardContent className="space-y-4">
           <div className='flex flex-col sm:flex-row gap-4 sm:justify-between sm:items-center'>
             <div>
               <h2 className="font-medium text-sm mb-1">Sign out</h2>
               <p className="text-muted-foreground text-xs mb-1">End the current session on this device</p>
             </div>
-            <SignOutBtn className="px-6 py-4">
+            <SignOutBtn variant="outline" className="px-4 py-2">
               <LogOutIcon /> Sign out
             </SignOutBtn>
+          </div>
+          <Separator />
+          <div className='flex flex-col sm:flex-row gap-4 sm:justify-between sm:items-center'>
+            <div>
+              <h2 className="font-medium text-sm mb-1">Delete account</h2>
+              <p className="text-muted-foreground text-xs mb-1">Permanently delete account along all of its data</p>
+            </div>
+            <DeleteAccountBtn>
+              <Trash2 /> Delete account
+            </DeleteAccountBtn>
           </div>
         </CardContent>
       </Card>
