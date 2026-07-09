@@ -18,15 +18,12 @@ export const auth = betterAuth({
         enabled: true,
         hooks: {
             before: async (request: HookEndpointContext) => {
-                let validator: ZodObject = loginSchema;
                 if (!request.path)
                     throw new APIError("INTERNAL_SERVER_ERROR", {
                         message: "No path provided."
                     });
 
-                if (request.path.endsWith("/sign-up/email"))
-                    validator = registerSchema
-
+                const validator: ZodObject = request.path.endsWith("/sign-up/email") ? registerSchema : loginSchema;
                 const { success, error } = await validator.safeParseAsync({
                     ...request.body
                 })
@@ -35,7 +32,6 @@ export const auth = betterAuth({
                     throw new APIError("BAD_REQUEST", {
                         message: `Validation Error: ${formatZodErrors(error)}`
                     });
-
             }
         }
     },
