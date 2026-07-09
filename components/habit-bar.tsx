@@ -4,7 +4,7 @@ import { Checkbox } from './ui/checkbox'
 import { ChevronRight, Flame } from 'lucide-react'
 import Link from 'next/link'
 import { Dispatch, SetStateAction, useState } from 'react'
-import { useHandleCheck } from '@/lib/hooks/use-handle-check'
+import { useHandleCheck } from '@/hooks/use-handle-check'
 
 interface HabitBarProps {
     entryId: number | null

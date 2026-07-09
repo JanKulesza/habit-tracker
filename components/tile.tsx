@@ -1,7 +1,7 @@
 "use client"
 
 import { Entry, Habit } from "@/generated/prisma/client"
-import { useHandleCheck } from "@/lib/hooks/use-handle-check"
+import { useHandleCheck } from "@/hooks/use-handle-check"
 import { cn } from "@/lib/utils"
 import { format, isBefore, startOfDay } from "date-fns"
 import { Check, X } from "lucide-react"

@@ -1,4 +1,5 @@
 "use client"
+
 import { Entry, Habit } from "@/generated/prisma/client"
 import { Icon, ICON_COLORS } from "@/lib/validations";
 import { useState } from "react";
@@ -7,7 +8,7 @@ import { format, startOfDay, startOfWeek, subDays, subYears } from "date-fns";
 import { formatEntriesByDate, getBestStreak, getStreakLog } from "@/lib/utils";
 import { pl } from "date-fns/locale";
 import { Calendar, Check, Edit, Flame, Medal, Target } from "lucide-react";
-import { useHandleCheck } from "@/lib/hooks/use-handle-check";
+import { useHandleCheck } from "@/hooks/use-handle-check";
 import WeekTiles from "../week-tiles";
 import InfoBox from "../info-box";
 import HeatMap from "../heat-map";

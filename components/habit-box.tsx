@@ -9,7 +9,7 @@ import { Icon, ICON_COLORS } from "@/lib/validations"
 import { pl } from "date-fns/locale"
 import { Flame } from "lucide-react"
 import { Separator } from "./ui/separator"
-import { useHandleCheck } from "@/lib/hooks/use-handle-check"
+import { useHandleCheck } from "@/hooks/use-handle-check"
 
 interface HabitBoxProps {
     habit: Habit

@@ -1,6 +1,6 @@
 import { Entry, Habit } from "@/generated/prisma/client";
 import { Dispatch, SetStateAction, useState } from "react";
-import { toggleEntry } from "../dal/entries";
+import { toggleEntry } from "@/lib/dal/entries";
 import { format, isBefore, startOfDay } from "date-fns";
 import { toast } from "sonner";
 
