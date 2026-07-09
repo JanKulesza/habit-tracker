@@ -1,8 +1,12 @@
 import { isAfter } from "date-fns"
 import { formatInTimeZone } from "date-fns-tz"
 
+export function toZonedDateStr(date: Date, timeZone: string): string {
+    return formatInTimeZone(date, timeZone, 'yyyy-MM-dd')
+}
+
 export function isFutureDate(dateStr: string, timeZone: string): boolean {
-    const inZoneToday = formatInTimeZone(new Date(), timeZone, 'yyyy-MM-dd')
+    const inZoneToday = toZonedDateStr(new Date(), timeZone);
     return isAfter(dateStr, inZoneToday)
 }
 

@@ -3,10 +3,10 @@ import { PrismaClientKnownRequestError } from "@prisma/client/runtime/client"
 import { prisma } from "../prisma"
 import { ServerActionResponse } from "../types/response"
 import { formatZodErrors } from "../utils"
-import { entrySchema, isFutureDate } from "../validations"
+import { entrySchema, toZonedDateStr } from "../validations"
 import { requireSession } from "./session"
 import { Entry, Habit } from "@/generated/prisma/browser"
-import { format, isBefore, startOfDay } from "date-fns"
+import { isBefore } from "date-fns"
 import { cache } from "react"
 
 export const getEntriesForCurrentUser = cache(async (habitId?: Habit['id']): Promise<ServerActionResponse<Entry[]>> => {
@@ -37,7 +37,7 @@ export async function toggleEntry(habitId: Habit['id'], date: { dateStr: string,
     const { user } = await requireSession()
 
     try {
-        const { dateStr } = date;
+        const { dateStr, timeZone } = date;
         const { success, error } = await entrySchema.safeParseAsync({ habitId, date })
         if (!success)
             return { success: false, error: formatZodErrors(error) };
@@ -68,9 +68,8 @@ export async function toggleEntry(habitId: Habit['id'], date: { dateStr: string,
                 return { success: false, error: "Habit not found" }
             }
 
-            if (isBefore(dateStr, format(habit.createdAt, 'yyyy-MM-dd'))) {
+            if (isBefore(dateStr, toZonedDateStr(habit.createdAt, timeZone))) 
                 return { success: false, error: "Unable to create an entry before habit creation day." }
-            }
 
             const entry = await prisma.entry.upsert({
                 where: {
