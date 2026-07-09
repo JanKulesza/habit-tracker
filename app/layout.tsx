@@ -44,7 +44,7 @@ export default function RootLayout({
             <Toaster
               position="bottom-center"
               toastOptions={{
-                className: "!flex !items-center !gap-3 !rounded-xl !border !p-4 !shadow-lg !backdrop-blur-md",
+                className: "!flex !items-center !gap-3 !rounded-xl !border !p-4 !shadow-lg !backdrop-blur-md whitespace-pre-line",
                 classNames: {
                   success: "!border-emerald-500/20 !bg-emerald-50/90 !text-emerald-900 dark:!bg-emerald-950/90 dark:!text-emerald-100 [&_svg]:!text-emerald-600 dark:[&_svg]:!text-emerald-400",
                   error: "!border-rose-500/20 !bg-rose-50/90 !text-rose-900 dark:!bg-rose-950/90 dark:!text-rose-100 [&_svg]:!text-rose-600 dark:[&_svg]:!text-rose-400",

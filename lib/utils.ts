@@ -8,8 +8,12 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
 }
 
+export function capitalizeFirstLetter(val: string) {
+    return val.charAt(0).toUpperCase() + val.slice(1);
+}
+
 export function formatZodErrors(err: ZodError) {
-  return err.issues.map(err => `${err.path.join('.')}: ${err.message}`).join(". \n");
+  return err.issues.map(err => capitalizeFirstLetter(`${err.path.join('.')}: ${err.message}`)).join("\n");
 }
 
 export function formatEntriesByDate(entries: Entry[], startDate: Date): Record<string, Entry[]> {
