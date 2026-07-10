@@ -20,7 +20,7 @@ interface HabitBoxProps {
 }
 
 export default function HabitBox({ habit, entryId, streak, currentEntriesSnapshot, onResult }: HabitBoxProps) {
-    const { isPending, isChecked, handleCheck } = useHandleCheck(currentEntriesSnapshot, onResult, habit, entryId);
+    const { isChecked, handleCheck } = useHandleCheck(currentEntriesSnapshot, onResult, habit, entryId);
     const date = new Date(),
         rgbColor = ICON_COLORS[habit.icon as Icon] ?? ICON_COLORS["default"];
 
@@ -66,7 +66,6 @@ export default function HabitBox({ habit, entryId, streak, currentEntriesSnapsho
                     }}
                     checked={isChecked}
                     className="rounded-xl size-7 cursor-pointer"
-                    disabled={isPending}
                 />
             </div>
             <div className="flex justify-between gap-2">

@@ -29,7 +29,7 @@ export default function HabitDetailsClientPage({ habit: h, habitEntries }: Habit
         entryId = entriesThisWeek[formattedDate]?.[0]?.id ?? null,
         rgbColor = ICON_COLORS[habit.icon as Icon] ?? ICON_COLORS["default"];
 
-    const { isPending, isChecked, handleCheck } = useHandleCheck(entries, setEntries, habit, entryId);
+    const { isChecked, handleCheck } = useHandleCheck(entries, setEntries, habit, entryId);
 
     const last30DaysPercent = (() => {
         let daysDone = 0;
@@ -100,7 +100,7 @@ export default function HabitDetailsClientPage({ habit: h, habitEntries }: Habit
                     </div>
                 </div>
                 <div className="flex gap-2 items-center">
-                    <Button onClick={() => handleCheck()} variant={!isChecked ? "default" : "secondary"} disabled={isPending} size="lg" className="font-normal p-5">
+                    <Button onClick={() => handleCheck()} variant={!isChecked ? "default" : "secondary"} size="lg" className="font-normal p-5">
                         <Check /> {isChecked ? "Completed for today" : "Check for today"}
                     </Button>
                     <UpsertHabitBtn habit={habit} onResult={setHabit}>

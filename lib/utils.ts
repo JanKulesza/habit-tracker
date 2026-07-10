@@ -1,6 +1,6 @@
 import { Entry, Habit } from "@/generated/prisma/client";
 import { clsx, type ClassValue } from "clsx"
-import { addDays, format, isAfter, isBefore, isWithinInterval, startOfWeek, subDays } from "date-fns";
+import { addDays, format, isAfter, isBefore, isWithinInterval } from "date-fns";
 import { twMerge } from "tailwind-merge"
 import { ZodError } from "zod";
 

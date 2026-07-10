@@ -15,7 +15,7 @@ interface HabitBarProps {
 }
 
 export default function HabitBar({ habit, entryId, streak, onResult, currentEntriesSnapshot }: HabitBarProps) {
-    const { isPending, isChecked, handleCheck } = useHandleCheck(currentEntriesSnapshot, onResult, habit, entryId);
+    const { isChecked, handleCheck } = useHandleCheck(currentEntriesSnapshot, onResult, habit, entryId);
     
     return (
         <div className='flex py-4 items-center border-b gap-4'>
@@ -23,7 +23,6 @@ export default function HabitBar({ habit, entryId, streak, onResult, currentEntr
                 checked={isChecked}
                 onCheckedChange={() => handleCheck()}
                 className="rounded-xl size-7 cursor-pointer"
-                disabled={isPending}
             />
             <Link href={`/habits/${habit.id}`} className='flex flex-1 justify-between items-center'>
                 <div className='flex gap-4 items-center h-full'>
