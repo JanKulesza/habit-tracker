@@ -19,6 +19,11 @@ export const useHandleCheck = (
         if (isPending || isBefore(date, startOfDay(habit.createdAt)))
             return;
 
+        if (habitId < 0) {
+            toast.warning("Wait until the habit is created before checking it.")
+            return;
+        }
+
         startTransition(async () => {
             const snapshot = [...currentEntriesSnapshot],
                 mockId = -Date.now();

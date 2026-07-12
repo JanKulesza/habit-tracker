@@ -38,7 +38,7 @@ export default function HabitBox({ habitId, entryId }: HabitBoxProps) {
     const last30DaysPercent = completionRatePerRange(subDays(date, 30), 30, entries, 1);
 
     return (
-        <Link href={`/habits/${habit.id}`} className="rounded-lg border hover:border-primary p-6 space-y-6">
+        <Link href={`/habits/${habit.id >= 0 ? habit.id : ""}`} className="rounded-lg border hover:border-primary p-6 space-y-6">
             <div className="flex justify-between items-center">
                 <div className="flex gap-4 items-center leading-5">
                     <div className="size-11 bg-primary/15 rounded-lg p-2 flex items-center justify-center text-xl"
