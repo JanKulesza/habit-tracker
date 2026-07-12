@@ -2,6 +2,9 @@
 
 Streak is a modern Next.js application for building and tracking daily habits. It combines a polished dashboard, habit management, streak tracking, analytics, and secure authentication.
 
+
+**Google OAuth is temporary inactive due to adjustments to consent screen**
+
 [Live demo](https://streakatomictracker.vercel.app/)
 
 ## Features
@@ -137,7 +140,12 @@ These are planned enhancements for the next release cycles:
 - **Email verification** — email confirmation during registration to improve security.
 - **Mobile app** — React Native mobile version for quick check-ins on the go.
 - **Reports** — generate and export detailed stats for weekly, monthly and custom periods.
-- **Error pages** — create error and not found pages 
+- **Error pages** — create error and not found pages
+
+### Technical improvements
+- Move mutation functions fully out of `lib/dal` into `app/actions` for consistent DAL/Server Function separation
+- Automated tests — unit tests for streak calculation, integration tests for Server Functions, e2e for auth and habit flows
+- CI/CD pipeline (GitHub Actions) — lint, type-check and run tests on every PR
 
 ## Notes
 
