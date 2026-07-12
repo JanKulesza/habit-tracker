@@ -7,13 +7,15 @@ import { Check, X } from "lucide-react";
 import { ScrollArea, ScrollBar } from "./ui/scroll-area";
 import Tile from "./tile";
 import { useEntries, useHabit, useHabits } from "@/lib/store/habit-store";
+import { useEffect, useRef } from "react";
 
 export default function WeekTiles({ habitId }: { habitId?: Habit['id'] }) {
     const date = new Date();
     const habitsNum = habitId ? 1 : useHabits().length
     const habit = habitId ? useHabit(habitId) : null
-    const currentEntriesSnapshot = useEntries(habitId),
-        entriesThisWeek = formatEntriesByDate(currentEntriesSnapshot, startOfWeek(date, { locale: pl }));
+    const currentEntriesSnapshot = useEntries(habitId);
+    const viewportRef = useRef<HTMLDivElement>(null);
+    const entriesThisWeek = formatEntriesByDate(currentEntriesSnapshot, startOfWeek(date, { locale: pl }));
     let entriesArr: {
         date: Date,
         entryId: Entry['id'] | null,
@@ -44,9 +46,16 @@ export default function WeekTiles({ habitId }: { habitId?: Habit['id'] }) {
             })
     }
 
+    useEffect(() => {
+        const viewport = viewportRef.current;
+        if (viewport) {
+            viewport.scrollLeft = viewport.scrollWidth;
+        }
+    }, [entriesArr]);
+
     return (
 
-        <ScrollArea>
+        <ScrollArea viewportRef={viewportRef}>
             <div className="flex gap-2 p-1">
                 {entriesArr.map((entry, i) => {
                     if (!habit)

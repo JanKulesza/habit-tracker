@@ -1,8 +1,6 @@
 "use client"
 
 import { Habit } from "@/generated/prisma/client"
-import { Button } from "../ui/button"
-import { Trash2 } from "lucide-react"
 import {
     AlertDialog,
     AlertDialogAction,
@@ -22,22 +20,23 @@ import { isRedirectError } from "next/dist/client/components/redirect-error"
 
 interface DeleteHabitBtnProps {
     habitId: Habit['id'],
+    children: React.ReactNode
 }
 
-export default function DeleteHabitBtn({ habitId }: DeleteHabitBtnProps) {
+export default function DeleteHabitBtn({ habitId, children }: DeleteHabitBtnProps) {
     const [isPending, startTransition] = useTransition();
 
     const handleDelete = () => startTransition(async () => {
         try {
             const res = await deleteHabit(habitId);
 
-        if (!res?.success) {
-            toast.error(res.error);
-            return
-        }
-        toast.success("Deleted habit successfully.")
+            if (!res?.success) {
+                toast.error(res.error);
+                return
+            }
+            toast.success("Deleted habit successfully.")
         } catch (error) {
-            if(isRedirectError(error))
+            if (isRedirectError(error))
                 throw error;
             toast.error("Network error. Please check your connection and try again.");
         }
@@ -46,7 +45,7 @@ export default function DeleteHabitBtn({ habitId }: DeleteHabitBtnProps) {
     return (
         <AlertDialog>
             <AlertDialogTrigger asChild>
-                <Button variant="destructive" className="font-normal p-5"><Trash2 /></Button>
+                {children}
             </AlertDialogTrigger>
             <AlertDialogContent>
                 <AlertDialogHeader>

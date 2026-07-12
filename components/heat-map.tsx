@@ -1,9 +1,10 @@
-import { Entry, Habit } from '@/generated/prisma/client'
+import { Habit } from '@/generated/prisma/client'
 import { formatEntriesByDate } from '@/lib/utils'
 import { addDays, endOfWeek, format, isBefore, startOfDay, startOfWeek } from 'date-fns'
 import { pl } from 'date-fns/locale'
 import { ScrollArea, ScrollBar } from './ui/scroll-area'
 import { useEntries } from '@/lib/store/habit-store'
+import { useEffect, useRef } from 'react'
 
 interface HeatMapProps {
     startDate: Date
@@ -16,6 +17,9 @@ export default function HeatMap({ startDate, endDate, habitId, habitsCreationDat
     const entries = useEntries(habitId)
     startDate = startOfWeek(startDate, { locale: pl });
     endDate = endOfWeek(endDate, { locale: pl })
+
+    const viewportRef = useRef<HTMLDivElement>(null);
+
     const entriesInPeriod = formatEntriesByDate(entries, startDate)
     let entriesArr: {
         date: Date,
@@ -42,14 +46,21 @@ export default function HeatMap({ startDate, endDate, habitId, habitsCreationDat
             })
     }
 
+    useEffect(() => {
+        const viewport = viewportRef.current;
+        if (viewport) {
+            viewport.scrollLeft = viewport.scrollWidth;
+        }
+    }, [entriesArr]);
+
     return (
-        <div className='flex'>
-            <div className="flex flex-col justify-evenly text-xs mr-2 my-4 mt-6 text-muted-foreground">
+        <div className='flex min-w-0'>
+            <div className="flex flex-col justify-evenly text-xs mr-2 my-4 mt-6 text-muted-foreground shrink-0">
                 <span>Tue</span>
                 <span>Thu</span>
                 <span>Sat</span>
             </div>
-            <ScrollArea className='w-full overflow-x-auto'>
+            <ScrollArea className='min-w-0' viewportRef={viewportRef}>
                 <div className='flex gap-1 mb-2'>
                     {entriesArr.map((_, idx) => {
                         if (idx % 7 !== 0)
@@ -70,6 +81,5 @@ export default function HeatMap({ startDate, endDate, habitId, habitsCreationDat
                 <ScrollBar orientation="horizontal" />
             </ScrollArea>
         </div>
-
     )
 }

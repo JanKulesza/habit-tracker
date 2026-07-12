@@ -124,12 +124,12 @@ export default function HomePageClient({ userName }: HomePageCientProps) {
                         />
                     })}
                 </div>
-                <div className='space-y-8 lg:w-2/5'>
+                <div className='space-y-8 lg:w-2/5 min-w-0'>
                     <div className='w-full space-y-4 border rounded-lg p-6'>
                         <h2 className="font-medium">This week</h2>
                         <WeekTiles />
                     </div>
-                    <div className="w-full space-y-4 border rounded-lg p-6">
+                    <div className="w-full min-w-0 space-y-4 border rounded-lg p-6">
                         <div className="flex justify-between items-center">
                             <h2 className="font-medium">Activity</h2>
                             <p className="text-muted-foreground text-sm">Last 20 weeks</p>
