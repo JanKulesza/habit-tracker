@@ -82,3 +82,13 @@ export function getBestStreak(streakLog: Map<string, number>): number {
 
   return best;
 }
+
+export const getBaseUrl = () => {
+    if (process.env.NEXT_PUBLIC_APP_URL) {
+        return process.env.NEXT_PUBLIC_APP_URL; // ręcznie ustawiony override, np. custom domena
+    }
+    if (process.env.VERCEL_URL) {
+        return `https://${process.env.VERCEL_URL}`; // automatyczny z Vercela
+    }
+    return "http://localhost:3000"; // lokalny dev
+};
