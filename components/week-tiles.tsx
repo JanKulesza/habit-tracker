@@ -1,29 +1,19 @@
 "use client"
 import { Entry, Habit } from "@/generated/prisma/client"
 import { cn, formatEntriesByDate } from "@/lib/utils";
-import { addDays, endOfWeek, format, isBefore, startOfWeek } from "date-fns";
+import { addDays, endOfWeek, format, isBefore, startOfDay, startOfWeek } from "date-fns";
 import { pl } from "date-fns/locale";
 import { Check, X } from "lucide-react";
-import { Dispatch, SetStateAction } from "react";
 import { ScrollArea, ScrollBar } from "./ui/scroll-area";
 import Tile from "./tile";
+import { useEntries, useHabit, useHabits } from "@/lib/store/habit-store";
 
-type WeekTilesProps =
-    | {
-        habitsNum: number
-        habit?: null
-        currentEntriesSnapshot: Entry[]
-    }
-    | {
-        habitsNum?: 1
-        habit: Habit
-        onResult: Dispatch<SetStateAction<Entry[]>>
-        currentEntriesSnapshot: Entry[]
-    };
-
-export default function WeekTiles(props: WeekTilesProps) {
-    const { habitsNum, habit } = props,
-        entriesThisWeek = formatEntriesByDate(props.currentEntriesSnapshot, startOfWeek(new Date(), { locale: pl }));
+export default function WeekTiles({ habitId }: { habitId?: Habit['id'] }) {
+    const date = new Date();
+    const habitsNum = habitId ? 1 : useHabits().length
+    const habit = habitId ? useHabit(habitId) : null
+    const currentEntriesSnapshot = useEntries(habitId),
+        entriesThisWeek = formatEntriesByDate(currentEntriesSnapshot, startOfWeek(date, { locale: pl }));
     let entriesArr: {
         date: Date,
         entryId: Entry['id'] | null,
@@ -32,7 +22,7 @@ export default function WeekTiles(props: WeekTilesProps) {
         ofr: boolean
     }[] = [];
 
-    for (let i = startOfWeek(new Date(), { locale: pl }); isBefore(i, endOfWeek(new Date(), { locale: pl })); i = addDays(i, 1)) {
+    for (let i = startOfWeek(date, { locale: pl }); isBefore(i, endOfWeek(date, { locale: pl })); i = addDays(i, 1)) {
         const entriesThisDay = entriesThisWeek[format(i, 'yyyy-MM-dd')]
         if (entriesThisDay && entriesThisDay.length > 0)
             entriesArr.push({
@@ -50,7 +40,7 @@ export default function WeekTiles(props: WeekTilesProps) {
                 entryId: null,
                 day: format(i, 'EEEEEE'),
                 checked: false,
-                ofr: !entriesThisDay
+                ofr: !entriesThisDay || (!!habit && isBefore(date, startOfDay(habit.createdAt)))
             })
     }
 
@@ -79,9 +69,7 @@ export default function WeekTiles(props: WeekTilesProps) {
                         day={entry.day}
                         isOutOfRange={entry.ofr}
                         date={entry.date}
-                        habit={habit}
-                        onResult={props.onResult}
-                        currentEntriesSnapshot={props.currentEntriesSnapshot}
+                        habitId={habit.id}
                     />
                 }
                 )}

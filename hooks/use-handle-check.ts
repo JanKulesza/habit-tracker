@@ -1,17 +1,19 @@
 import { Entry, Habit } from "@/generated/prisma/client";
-import { Dispatch, SetStateAction, useTransition } from "react";
+import { useTransition } from "react";
 import { toggleEntry } from "@/lib/dal/entries";
 import { format, isBefore, startOfDay } from "date-fns";
 import { toast } from "sonner";
+import { useEntries, useHabit, useHabitActions } from "@/lib/store/habit-store";
 
 export const useHandleCheck = (
-    currentEntriesSnapshot: Entry[],
-    onResult: Dispatch<SetStateAction<Entry[]>>,
-    habit: Habit,
+    habitId: Habit['id'],
     entryId: Entry['id'] | null,
 ) => {
     const [isPending, startTransition] = useTransition()
     const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+    const { setEntries } = useHabitActions()
+    const currentEntriesSnapshot = useEntries();
+    const habit = useHabit(habitId)!;
 
     const handleCheck = (date: Date = new Date()) => {
         if (isPending || isBefore(date, startOfDay(habit.createdAt)))
@@ -22,9 +24,9 @@ export const useHandleCheck = (
                 mockId = -Date.now();
 
             if (entryId)
-                onResult(currentEntriesSnapshot.filter(e => e.id !== entryId));
+                setEntries(currentEntriesSnapshot.filter(e => e.id !== entryId));
             else
-                onResult([...currentEntriesSnapshot, {
+                setEntries([...currentEntriesSnapshot, {
                     id: mockId,
                     date: format(date, 'yyyy-MM-dd'),
                     habitId: habit.id,
@@ -40,10 +42,10 @@ export const useHandleCheck = (
 
                 if (!res?.success) {
                     toast.error(res.error);
-                    onResult(snapshot)
+                    setEntries(snapshot)
                 }
                 else if (res.data) {
-                    onResult(prevEntries => {
+                    setEntries(prevEntries => {
                         const filtered = prevEntries.filter(e => e.id !== mockId);
                         return [...filtered, res.data!];
                     });
@@ -53,7 +55,7 @@ export const useHandleCheck = (
                     toast.success("Unchecked habit.")
             } catch {
                 toast.error("Network error. Please check your connection and try again.");
-                onResult(snapshot);
+                setEntries(snapshot);
             }
         })
     }

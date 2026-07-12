@@ -1,11 +1,9 @@
 "use client"
 
-import { Entry, Habit } from "@/generated/prisma/client"
 import { Icon, ICON_COLORS } from "@/lib/validations";
-import { useState } from "react";
 import { Button } from "../ui/button";
 import { format, startOfDay, startOfWeek, subDays, subYears } from "date-fns";
-import { formatEntriesByDate, getBestStreak, getStreakLog } from "@/lib/utils";
+import { formatEntriesByDate } from "@/lib/utils";
 import { pl } from "date-fns/locale";
 import { Calendar, Check, Edit, Flame, Medal, Target } from "lucide-react";
 import { useHandleCheck } from "@/hooks/use-handle-check";
@@ -14,22 +12,31 @@ import InfoBox from "../info-box";
 import HeatMap from "../heat-map";
 import UpsertHabitBtn from "../buttons/upsert-habit-btn";
 import DeleteHabitBtn from "../buttons/delete-habit-btn";
+import { useEntries, useHabit } from "@/lib/store/habit-store";
+import { useStreakData } from "@/hooks/use-streak-data";
+import { Spinner } from "../ui/spinner";
 
-interface HabitDetailsClientPageProps {
-    habit: Habit
-    habitEntries: Entry[]
-}
+export default function HabitDetailsClientPage({id}: {id: number}) {
+    const habit = useHabit(id);
+    const entries = useEntries(id); // Entries for this habit only
 
-export default function HabitDetailsClientPage({ habit: h, habitEntries }: HabitDetailsClientPageProps) {
-    const [habit, setHabit] = useState(h);
-    const [entries, setEntries] = useState(habitEntries); // Entries for this habit only
     const date = new Date(),
         formattedDate = format(date, 'yyyy-MM-dd'),
         entriesThisWeek = formatEntriesByDate(entries, startOfWeek(date, { locale: pl })),
-        entryId = entriesThisWeek[formattedDate]?.[0]?.id ?? null,
-        rgbColor = ICON_COLORS[habit.icon as Icon] ?? ICON_COLORS["default"];
+        entryId = entriesThisWeek[formattedDate]?.[0]?.id ?? null;
 
-    const { isChecked, handleCheck } = useHandleCheck(entries, setEntries, habit, entryId);
+    const { isChecked, handleCheck } = useHandleCheck(id, entryId);
+    const { streakLogs, bestStreaks } = useStreakData()
+
+    if (!habit)
+        return (
+        <div className="w-full h-full flex items-center ">
+            <Spinner className="mx-auto scale-200" />
+        </div>
+        );
+
+    const rgbColor = ICON_COLORS[habit.icon as Icon] ?? ICON_COLORS["default"];
+
 
     const last30DaysPercent = (() => {
         let daysDone = 0;
@@ -44,9 +51,9 @@ export default function HabitDetailsClientPage({ habit: h, habitEntries }: Habit
         return (daysDone * 100) / 30;
     })().toFixed(0);
 
-    const habitStreakLog = getStreakLog(habit, entries);
-    const bestStreak = getBestStreak(new Map<Habit['id'], Map<string, number>>([[habit.id, habitStreakLog]])),
-        currentStreak = habitStreakLog.get(formattedDate);
+    const strakLog = streakLogs.get(id)!,
+        bestStreak = bestStreaks.get(id) ?? 0,
+        currentStreak = strakLog.get(formattedDate);
 
     const infoBoxes = [
         {
@@ -103,7 +110,7 @@ export default function HabitDetailsClientPage({ habit: h, habitEntries }: Habit
                     <Button onClick={() => handleCheck()} variant={!isChecked ? "default" : "secondary"} size="lg" className="font-normal p-5">
                         <Check /> {isChecked ? "Completed for today" : "Check for today"}
                     </Button>
-                    <UpsertHabitBtn habit={habit} onResult={setHabit}>
+                    <UpsertHabitBtn habitId={habit.id}>
                         <Button variant="outline" className="font-normal p-5"><Edit /></Button>
                     </UpsertHabitBtn>
                     <DeleteHabitBtn habitId={habit.id} />
@@ -124,9 +131,7 @@ export default function HabitDetailsClientPage({ habit: h, habitEntries }: Habit
             <div className='w-full space-y-4 border rounded-lg p-6'>
                 <h2 className="font-medium">This week</h2>
                 <WeekTiles
-                    currentEntriesSnapshot={entries}
-                    habit={habit}
-                    onResult={setEntries}
+                    habitId={habit.id}
                 />
             </div>
             <div className='space-y-8'>
@@ -138,7 +143,7 @@ export default function HabitDetailsClientPage({ habit: h, habitEntries }: Habit
                     <HeatMap
                         startDate={subYears(date, 1)}
                         endDate={date}
-                        entries={entries}
+                        habitId={habit.id}
                         habitsCreationDates={[habit.createdAt]}
                     />
                 </div>

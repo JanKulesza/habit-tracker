@@ -6,28 +6,30 @@ import { HabitsSchema, habitsSchema, Icon } from '@/lib/validations'
 import { zodResolver } from '@hookform/resolvers/zod'
 import FormInput from '../inputs/form-input'
 import { createHabit, updateHabit } from '@/lib/dal/habits'
-import { Dispatch, SetStateAction, useState } from 'react'
+import { useState } from 'react'
 import { Spinner } from '../ui/spinner'
 import FormSelect from '../inputs/form-select'
 import { Habit } from '@/generated/prisma/client'
 import { toast } from 'sonner'
+import { useHabit, useHabitActions, useHabits } from '@/lib/store/habit-store'
 
 type UpsertHabitProps =
     | {
-        habit?: null
-        currentHabitsSnapshot: Habit[]
-        onResult: Dispatch<SetStateAction<Habit[]>>
+        habitId?: undefined
         children: React.ReactNode
     }
     | {
-        habit: Habit
-        currentHabitsSnapshot?: null
-        onResult: Dispatch<SetStateAction<Habit>>
+        habitId: Habit['id']
         children: React.ReactNode
     }
 
-export default function UpsertHabitBtn({ currentHabitsSnapshot, onResult, habit, children }: UpsertHabitProps) {
+export default function UpsertHabitBtn({ habitId, children }: UpsertHabitProps) {
     const [open, setOpen] = useState(false);
+
+    const habit = habitId ? useHabit(habitId) : null
+    const currentHabitsSnapshot = useHabits() as Habit[];
+    const { updateHabit: updateHabitAction, setHabits } = useHabitActions();
+
     const form = useForm<HabitsSchema>({
         resolver: zodResolver(habitsSchema),
         defaultValues: habit ? {
@@ -50,62 +52,57 @@ export default function UpsertHabitBtn({ currentHabitsSnapshot, onResult, habit,
         formData.append('goal', goal);
         formData.append('icon', icon);
 
-        const mockHabit: Habit = { 
+        const mockHabit: Habit = {
             ...values,
-            frequency: "daily", 
-            id: habit ? habit.id : -Date.now(), 
-            userId: habit ? habit.userId : "mock", 
+            frequency: "daily",
+            id: habit ? habit.id : -Date.now(),
+            userId: habit ? habit.userId : "mock",
             createdAt: new Date()
         };
 
+        const snapshot = [...currentHabitsSnapshot];
         try {
             if (!habit) {
                 // Create mode (habit is undefined)
-                const snapshot = [...currentHabitsSnapshot];
-                
-                onResult([...currentHabitsSnapshot, mockHabit]);
+
+                setHabits([...snapshot, mockHabit]);
                 setOpen(false);
 
                 const res = await createHabit(formData);
 
                 if (!res.success) {
                     toast.error(res.error);
-                    onResult(snapshot);
+                    setHabits(snapshot);
                     setOpen(true);
                     return;
                 }
 
                 toast.success("Habit created successfully!");
-                onResult([...snapshot, res.data]);
+                setHabits([...snapshot, res.data]);
                 form.reset();
 
             } else {
                 // Edit mode (habit is defined)
-                const snapshot = { ...habit };
-                
-                onResult(mockHabit);
+
+                updateHabitAction(mockHabit);
                 setOpen(false);
 
                 const res = await updateHabit(habit.id, formData);
 
                 if (!res.success) {
                     toast.error(res.error);
-                    onResult(snapshot);
+                    setHabits(snapshot);
                     setOpen(true);
                     return;
                 }
 
                 toast.success("Habit updated successfully!");
-                onResult(res.data); 
+                updateHabitAction(res.data);
                 form.reset();
             }
         } catch (error) {
             toast.error("Network error. Please check your connection and try again.");
-            if (!habit) {
-                onResult([...currentHabitsSnapshot]);
-            } else {
-                onResult(habit);
-            }
+            setHabits(snapshot)
             setOpen(true);
         }
     }

@@ -1,17 +1,19 @@
-import { Entry } from '@/generated/prisma/client'
+import { Entry, Habit } from '@/generated/prisma/client'
 import { formatEntriesByDate } from '@/lib/utils'
 import { addDays, endOfWeek, format, isBefore, startOfDay, startOfWeek } from 'date-fns'
 import { pl } from 'date-fns/locale'
 import { ScrollArea, ScrollBar } from './ui/scroll-area'
+import { useEntries } from '@/lib/store/habit-store'
 
 interface HeatMapProps {
     startDate: Date
     endDate: Date
-    entries: Entry[]
+    habitId?: Habit['id']
     habitsCreationDates: Date[]
 }
 
-export default function HeatMap({ startDate, endDate, entries, habitsCreationDates }: HeatMapProps) {
+export default function HeatMap({ startDate, endDate, habitId, habitsCreationDates }: HeatMapProps) {
+    const entries = useEntries(habitId)
     startDate = startOfWeek(startDate, { locale: pl });
     endDate = endOfWeek(endDate, { locale: pl })
     const entriesInPeriod = formatEntriesByDate(entries, startDate)

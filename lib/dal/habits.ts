@@ -7,6 +7,9 @@ import { requireSession } from "./session"
 import { formatZodErrors } from "../utils"
 import { cache } from "react"
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime/client"
+import { revalidatePath } from "next/cache"
+import { redirect } from "next/navigation"
+import { isRedirectError } from "next/dist/client/components/redirect-error"
 
 export const getHabitsForCurrentUser = cache(async (): Promise<ServerActionResponse<Habit[]>> => {
     const session = await requireSession();
@@ -110,11 +113,12 @@ export async function deleteHabit(habitId: Habit['id']): Promise<ServerActionRes
                 userId: user.id
             },
         })
-        return { success: true, data: null };
+        revalidatePath("/habits");
     } catch (error) {
         if (error instanceof PrismaClientKnownRequestError && error.code === "P2025")
             return { success: false, error: "Habit not found." }
         console.error("Error deleting habit:", error);
         return { success: false, error: "Failed to delete habit." }
     }
+    redirect("/habits");
 }

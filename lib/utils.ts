@@ -9,7 +9,7 @@ export function cn(...inputs: ClassValue[]) {
 }
 
 export function capitalizeFirstLetter(val: string) {
-    return val.charAt(0).toUpperCase() + val.slice(1);
+  return val.charAt(0).toUpperCase() + val.slice(1);
 }
 
 export function formatZodErrors(err: ZodError) {
@@ -60,24 +60,25 @@ export function getStreakLog(habit: Habit, entries: Entry[]): Map<string, number
 
   while (isBefore(date, format(new Date(), 'yyyy-MM-dd'))) {
     date = format(addDays(date, 1), 'yyyy-MM-dd');
+    streakLog.set(date, previousStreak);
     if (!entriesSet.has(date))
       previousStreak = 0;
-    else previousStreak++;
-    streakLog.set(date, previousStreak);
+    else {
+      previousStreak++;
+      streakLog.set(date, previousStreak);
+    }
   }
 
   return streakLog
 }
 
 // Takes streakLogs for every habit and returns the best streak out of all
-export function getBestStreak(streakLogs: Map<Habit['id'], Map<string, number>>) {
+export function getBestStreak(streakLog: Map<string, number>): number {
   let best = 0;
-  streakLogs.forEach((s => {
-    s.forEach((val) => {
-      if (val > best)
-        best = val;
-    })
-  }))
+  streakLog.forEach((val) => {
+    if (val > best)
+      best = val;
+  })
 
   return best;
 }

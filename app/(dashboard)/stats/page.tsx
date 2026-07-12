@@ -7,13 +7,12 @@ import { ChartConfig } from "@/components/ui/chart";
 import { ProgressU } from "@/components/ui/progress-updated";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
-import { Habit } from "@/generated/prisma/client";
 import { getEntriesForCurrentUser } from "@/lib/dal/entries";
 import { getHabitsForCurrentUser } from "@/lib/dal/habits";
-import { completionRatePerRange, getBestStreak, getStreakLog } from "@/lib/utils";
+import { completionRatePerRange } from "@/lib/utils";
 import { subDays, startOfDay, format, isAfter } from "date-fns";
 import { sort } from "fast-sort";
-import { TrendingUp, Flame, Medal, Check, TrendingDown } from "lucide-react";
+import { TrendingUp, Flame, Check, TrendingDown, List } from "lucide-react";
 import { Fragment } from "react/jsx-runtime";
 import { toast } from "sonner";
 
@@ -28,12 +27,6 @@ export default async function StatsPage() {
 
     const lastMonthCompletionRate = completionRatePerRange(subDays(date, 30), 30, entries, habits.length),
         lastWeekCompletionRate = completionRatePerRange(subDays(date, 7), 7, entries, habits.length);
-
-    const habitStreakLogs = new Map<Habit['id'], Map<string, number>>();
-    for (const h of habits) {
-        habitStreakLogs.set(h.id, getStreakLog(h, entries));
-    }
-    const bestStreak = getBestStreak(habitStreakLogs);
 
     const infoBoxes = [
         {
@@ -51,11 +44,11 @@ export default async function StatsPage() {
             description: "Completion rate",
         },
         {
-            title: "Best streak",
-            icon: Medal,
+            title: "Total habits",
+            icon: List,
             iconColor: "text-[#a176f1]",
-            text: `${bestStreak} ${bestStreak === 1 ? "day" : "days"}`,
-            description: "All-time record"
+            text: `${habits.length} habits`,
+            description: "Keep it up!"
         },
         {
             title: "All-together",

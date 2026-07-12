@@ -14,36 +14,34 @@ import {
     AlertDialogTitle,
     AlertDialogTrigger,
 } from "@/components/ui/alert-dialog"
-import { useState } from "react"
+import { useTransition } from "react"
 import { deleteHabit } from "@/lib/dal/habits"
 import { toast } from "sonner"
 import { Spinner } from "../ui/spinner"
-import { useRouter } from "next/navigation"
+import { isRedirectError } from "next/dist/client/components/redirect-error"
 
 interface DeleteHabitBtnProps {
     habitId: Habit['id'],
 }
 
 export default function DeleteHabitBtn({ habitId }: DeleteHabitBtnProps) {
-    const [isPending, setIsPending] = useState(false);
-    const router = useRouter();
+    const [isPending, startTransition] = useTransition();
 
-    const handleDelete = async () => {
-        setIsPending(true);
-            
+    const handleDelete = () => startTransition(async () => {
         try {
             const res = await deleteHabit(habitId);
 
-            if (!res?.success) 
-                return toast.error(res.error);
-            toast.success("Deleted habit successfully.")
-            router.push("/habits");
-        } catch (error) {
-            toast.error("Network error. Please check your connection and try again.");
-        } finally {
-            setIsPending(false);
+        if (!res?.success) {
+            toast.error(res.error);
+            return
         }
-    }
+        toast.success("Deleted habit successfully.")
+        } catch (error) {
+            if(isRedirectError(error))
+                throw error;
+            toast.error("Network error. Please check your connection and try again.");
+        }
+    })
 
     return (
         <AlertDialog>
@@ -60,7 +58,15 @@ export default function DeleteHabitBtn({ habitId }: DeleteHabitBtnProps) {
                 </AlertDialogHeader>
                 <AlertDialogFooter>
                     <AlertDialogCancel>Cancel</AlertDialogCancel>
-                    <AlertDialogAction variant="destructive" onClick={handleDelete}>{isPending ? <Spinner /> : "Continue"}</AlertDialogAction>
+                    <AlertDialogAction
+                        variant="destructive"
+                        onClick={(e) => {
+                            e.preventDefault();
+                            handleDelete()
+                        }}
+                    >
+                        {isPending ? <Spinner /> : "Continue"}
+                    </AlertDialogAction>
                 </AlertDialogFooter>
             </AlertDialogContent>
         </AlertDialog>
