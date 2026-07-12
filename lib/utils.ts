@@ -1,6 +1,6 @@
 import { Entry, Habit } from "@/generated/prisma/client";
 import { clsx, type ClassValue } from "clsx"
-import { addDays, format, isAfter, isBefore, isWithinInterval, startOfWeek, subDays } from "date-fns";
+import { addDays, format, isAfter, isBefore, isWithinInterval } from "date-fns";
 import { twMerge } from "tailwind-merge"
 import { ZodError } from "zod";
 
@@ -8,8 +8,12 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
 }
 
+export function capitalizeFirstLetter(val: string) {
+  return val.charAt(0).toUpperCase() + val.slice(1);
+}
+
 export function formatZodErrors(err: ZodError) {
-  return err.issues.map(err => `${err.path.join('.')}: ${err.message}`).join(". \n");
+  return err.issues.map(err => capitalizeFirstLetter(`${err.path.join('.')}: ${err.message}`)).join("\n");
 }
 
 export function formatEntriesByDate(entries: Entry[], startDate: Date): Record<string, Entry[]> {
@@ -56,24 +60,25 @@ export function getStreakLog(habit: Habit, entries: Entry[]): Map<string, number
 
   while (isBefore(date, format(new Date(), 'yyyy-MM-dd'))) {
     date = format(addDays(date, 1), 'yyyy-MM-dd');
+    streakLog.set(date, previousStreak);
     if (!entriesSet.has(date))
       previousStreak = 0;
-    else previousStreak++;
-    streakLog.set(date, previousStreak);
+    else {
+      previousStreak++;
+      streakLog.set(date, previousStreak);
+    }
   }
 
   return streakLog
 }
 
 // Takes streakLogs for every habit and returns the best streak out of all
-export function getBestStreak(streakLogs: Map<Habit['id'], Map<string, number>>) {
+export function getBestStreak(streakLog: Map<string, number>): number {
   let best = 0;
-  streakLogs.forEach((s => {
-    s.forEach((val) => {
-      if (val > best)
-        best = val;
-    })
-  }))
+  streakLog.forEach((val) => {
+    if (val > best)
+      best = val;
+  })
 
   return best;
 }

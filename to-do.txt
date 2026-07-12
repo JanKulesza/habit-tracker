@@ -1,4 +1,2 @@
 Replace divs in home to Card from shadcn
-Refactor code, add memoization
-Change disabled habit switch btn
-fix callback url in better auth
+show toast after redirect (maybe component in layout and cookies)

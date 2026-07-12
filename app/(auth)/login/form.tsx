@@ -3,13 +3,14 @@ import { FormCheckBox } from '@/components/inputs/form-checkbox';
 import FormInput from '@/components/inputs/form-input';
 import { Button } from '@/components/ui/button';
 import { FieldGroup } from '@/components/ui/field';
-import { credentialsLogin } from '@/lib/auth-client';
+import { useAuth } from '@/hooks/use-auth';
 import { LoginSchema, loginSchema } from '@/lib/validations';
 import { zodResolver } from '@hookform/resolvers/zod';
 import Link from 'next/link';
 import { useForm, FormProvider } from 'react-hook-form';
 
 export default function LoginForm() {
+    const { isPending, credentialsLogin } = useAuth();
     const form = useForm<LoginSchema>({
         resolver: zodResolver(loginSchema),
         defaultValues: {
@@ -30,9 +31,9 @@ export default function LoginForm() {
                         type="submit"
                         form="login-form"
                         className="p-5 w-full"
-                        disabled={form.formState.isSubmitting}
+                        disabled={isPending}
                     >
-                        {form.formState.isSubmitting ? "Logging in..." : "Log in"}
+                        {isPending ? "Logging in..." : "Log in"}
                     </Button>
                     <p className="text-sm text-center text-muted-foreground">Don't have an account? <Link href="/register" className="text-primary underline cursor-pointer">Register</Link></p>
                 </FieldGroup>

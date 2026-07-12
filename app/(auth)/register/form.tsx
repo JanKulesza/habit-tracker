@@ -1,15 +1,17 @@
 "use client"
+
 import { FormCheckBox } from '@/components/inputs/form-checkbox';
 import FormInput from '@/components/inputs/form-input';
 import { Button } from '@/components/ui/button';
 import { FieldGroup } from '@/components/ui/field';
-import { credentialsRegister } from '@/lib/auth-client';
+import { useAuth } from '@/hooks/use-auth';
 import { RegisterSchema, registerSchema } from '@/lib/validations';
 import { zodResolver } from '@hookform/resolvers/zod';
 import Link from 'next/link';
 import { useForm, FormProvider } from 'react-hook-form';
 
 export default function LoginForm() {
+    const { isPending, credentialsRegister } = useAuth();
     const form = useForm<RegisterSchema>({
         resolver: zodResolver(registerSchema),
         defaultValues: {
@@ -20,7 +22,7 @@ export default function LoginForm() {
             acceptTerms: false
         }
     })
-    
+
     return (
         <FormProvider {...form}>
             <form id="login-form" onSubmit={form.handleSubmit(credentialsRegister)}>
@@ -34,10 +36,10 @@ export default function LoginForm() {
                         type="submit"
                         form="login-form"
                         className="p-5 w-full"
-                        disabled={form.formState.isSubmitting}
+                        disabled={isPending}
                         onClick={() => { console.log(form.getValues()) }}
                     >
-                        {form.formState.isSubmitting ? "Registerring..." : "Register"}
+                        {isPending ? "Registerring..." : "Register"}
                     </Button>
                     <p className="text-sm text-center text-muted-foreground">Already have an account? <Link href="/login" className="text-primary underline cursor-pointer">Log in</Link></p>
                 </FieldGroup>

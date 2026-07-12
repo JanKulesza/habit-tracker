@@ -20,7 +20,7 @@ model User {
   acceptTerms   Boolean
   image         String?
   createdAt     DateTime  @db.Timestamptz(3)
-  updatedAt     DateTime  @db.Timestamptz(3)
+  updatedAt     DateTime  @db.Timestamptz(3) @updatedAt
   sessions      Session[]
   accounts      Account[]
 

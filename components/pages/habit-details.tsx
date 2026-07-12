@@ -1,34 +1,42 @@
 "use client"
-import { Entry, Habit } from "@/generated/prisma/client"
+
 import { Icon, ICON_COLORS } from "@/lib/validations";
-import { useState } from "react";
 import { Button } from "../ui/button";
 import { format, startOfDay, startOfWeek, subDays, subYears } from "date-fns";
-import { formatEntriesByDate, getBestStreak, getStreakLog } from "@/lib/utils";
+import { formatEntriesByDate } from "@/lib/utils";
 import { pl } from "date-fns/locale";
-import { Calendar, Check, Edit, Flame, Medal, Target } from "lucide-react";
-import { useHandleCheck } from "@/lib/hooks/use-handle-check";
+import { Calendar, Check, Edit, Flame, Medal, Target, Trash2 } from "lucide-react";
+import { useHandleCheck } from "@/hooks/use-handle-check";
 import WeekTiles from "../week-tiles";
 import InfoBox from "../info-box";
 import HeatMap from "../heat-map";
 import UpsertHabitBtn from "../buttons/upsert-habit-btn";
 import DeleteHabitBtn from "../buttons/delete-habit-btn";
+import { useEntries, useHabit } from "@/lib/store/habit-store";
+import { useStreakData } from "@/hooks/use-streak-data";
+import { Spinner } from "../ui/spinner";
 
-interface HabitDetailsClientPageProps {
-    habit: Habit
-    habitEntries: Entry[]
-}
+export default function HabitDetailsClientPage({ id }: { id: number }) {
+    const habit = useHabit(id);
+    const entries = useEntries(id); // Entries for this habit only
 
-export default function HabitDetailsClientPage({ habit: h, habitEntries }: HabitDetailsClientPageProps) {
-    const [habit, setHabit] = useState(h);
-    const [entries, setEntries] = useState(habitEntries); // Entries for this habit only
     const date = new Date(),
         formattedDate = format(date, 'yyyy-MM-dd'),
         entriesThisWeek = formatEntriesByDate(entries, startOfWeek(date, { locale: pl })),
-        entryId = entriesThisWeek[formattedDate]?.[0]?.id ?? null,
-        rgbColor = ICON_COLORS[habit.icon as Icon] ?? ICON_COLORS["default"];
+        entryId = entriesThisWeek[formattedDate]?.[0]?.id ?? null;
 
-    const { isPending, isChecked, handleCheck } = useHandleCheck(entries, setEntries, habit, entryId);
+    const { isChecked, handleCheck } = useHandleCheck(id, entryId);
+    const { streakLogs, bestStreaks } = useStreakData()
+
+    if (!habit)
+        return (
+            <div className="w-full h-full flex items-center ">
+                <Spinner className="mx-auto scale-200" />
+            </div>
+        );
+
+    const rgbColor = ICON_COLORS[habit.icon as Icon] ?? ICON_COLORS["default"];
+
 
     const last30DaysPercent = (() => {
         let daysDone = 0;
@@ -43,9 +51,9 @@ export default function HabitDetailsClientPage({ habit: h, habitEntries }: Habit
         return (daysDone * 100) / 30;
     })().toFixed(0);
 
-    const habitStreakLog = getStreakLog(habit, entries);
-    const bestStreak = getBestStreak(new Map<Habit['id'], Map<string, number>>([[habit.id, habitStreakLog]])),
-        currentStreak = habitStreakLog.get(formattedDate);
+    const strakLog = streakLogs.get(id)!,
+        bestStreak = bestStreaks.get(id) ?? 0,
+        currentStreak = strakLog.get(formattedDate);
 
     const infoBoxes = [
         {
@@ -80,15 +88,15 @@ export default function HabitDetailsClientPage({ habit: h, habitEntries }: Habit
     ]
     return (
         <>
-            <div className="flex justify-between items-center">
-                <div className="flex gap-4 items-center leading-5">
+            <div className="flex flex-col lg:flex-row gap-4 justify-between items-center">
+                <div className="flex flex-col sm:flex-row gap-4 items-center leading-5">
                     <div className="size-15 bg-primary/15 rounded-lg p-2 flex items-center justify-center text-2xl"
                         style={{ backgroundColor: `rgba(${rgbColor}, 0.15)` }}>
                         {habit.icon}
                     </div>
-                    <div>
-                        <h2 className="text-lg font-medium">{habit.name}</h2>
-                        <div className="flex gap-2 items-center text-xs">
+                    <div className="max-sm:space-y-4">
+                        <h2 className="text-lg font-medium max-sm:text-center">{habit.name}</h2>
+                        <div className="flex flex-col sm:flex-row gap-2 items-center text-xs">
                             <div className="flex items-center gap-2 rounded-xl py-1 px-5 bg-muted">
                                 <Target className="size-3.5" /> {habit.goal}
                             </div>
@@ -99,13 +107,15 @@ export default function HabitDetailsClientPage({ habit: h, habitEntries }: Habit
                     </div>
                 </div>
                 <div className="flex gap-2 items-center">
-                    <Button onClick={() => handleCheck()} variant={!isChecked ? "default" : "secondary"} disabled={isPending} size="lg" className="font-normal p-5">
+                    <Button onClick={() => handleCheck()} variant={!isChecked ? "default" : "secondary"} size="lg" className="font-normal sm:p-5">
                         <Check /> {isChecked ? "Completed for today" : "Check for today"}
                     </Button>
-                    <UpsertHabitBtn habit={habit} onResult={setHabit}>
-                        <Button variant="outline" className="font-normal p-5"><Edit /></Button>
+                    <UpsertHabitBtn habitId={habit.id}>
+                        <Button variant="outline" size="lg" className="font-normal sm:p-5"><Edit /></Button>
                     </UpsertHabitBtn>
-                    <DeleteHabitBtn habitId={habit.id} />
+                    <DeleteHabitBtn habitId={habit.id}>
+                        <Button variant="destructive" size="lg" className="font-normal sm:p-5"><Trash2 /></Button>
+                    </DeleteHabitBtn>
                 </div>
             </div>
             <div className="grid grid-cols-1 xl:grid-cols-4 lg:grid-cols-2 gap-4 w-full">
@@ -123,24 +133,20 @@ export default function HabitDetailsClientPage({ habit: h, habitEntries }: Habit
             <div className='w-full space-y-4 border rounded-lg p-6'>
                 <h2 className="font-medium">This week</h2>
                 <WeekTiles
-                    currentEntriesSnapshot={entries}
-                    habit={habit}
-                    onResult={setEntries}
+                    habitId={habit.id}
                 />
             </div>
-            <div className='space-y-8'>
-                <div className="w-full space-y-4 border rounded-lg p-6">
-                    <div className="flex justify-between items-center">
-                        <h2 className="font-medium">Activity</h2>
-                        <p className="text-muted-foreground text-sm">Last year</p>
-                    </div>
-                    <HeatMap
-                        startDate={subYears(date, 1)}
-                        endDate={date}
-                        entries={entries}
-                        habitsCreationDates={[habit.createdAt]}
-                    />
+            <div className="w-full min-w-0 space-y-4 border rounded-lg p-6">
+                <div className="flex justify-between items-center">
+                    <h2 className="font-medium">Activity</h2>
+                    <p className="text-muted-foreground text-sm">Last year</p>
                 </div>
+                <HeatMap
+                    startDate={subYears(date, 1)}
+                    endDate={date}
+                    habitId={habit.id}
+                    habitsCreationDates={[habit.createdAt]}
+                />
             </div>
         </>
     )

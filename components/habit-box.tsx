@@ -9,20 +9,23 @@ import { Icon, ICON_COLORS } from "@/lib/validations"
 import { pl } from "date-fns/locale"
 import { Flame } from "lucide-react"
 import { Separator } from "./ui/separator"
-import { useHandleCheck } from "@/lib/hooks/use-handle-check"
+import { useHandleCheck } from "@/hooks/use-handle-check"
+import { useEntries, useHabit } from "@/lib/store/habit-store"
+import { completionRatePerRange } from "@/lib/utils"
+import { useStreakData } from "@/hooks/use-streak-data"
 
 interface HabitBoxProps {
-    habit: Habit
+    habitId: Habit['id']
     entryId: Entry['id'] | null
-    streak: number
-    currentEntriesSnapshot: Entry[]
-    onResult: Dispatch<SetStateAction<Entry[]>>
 }
 
-export default function HabitBox({ habit, entryId, streak, currentEntriesSnapshot, onResult }: HabitBoxProps) {
-    const { isPending, isChecked, handleCheck } = useHandleCheck(currentEntriesSnapshot, onResult, habit, entryId);
-    const date = new Date(),
-        rgbColor = ICON_COLORS[habit.icon as Icon] ?? ICON_COLORS["default"];
+export default function HabitBox({ habitId, entryId }: HabitBoxProps) {
+    const habit = useHabit(habitId)!
+    const entries = useEntries(habitId)
+    const date = new Date();
+    const streak = useStreakData().streakLogs.get(habitId)?.get(format(new Date(), 'yyyy-MM-dd')) ?? 0
+    const { isChecked, handleCheck } = useHandleCheck(habit.id, entryId);
+    const rgbColor = ICON_COLORS[habit.icon as Icon] ?? ICON_COLORS["default"];
 
     let entriesArr: {
         day: string,
@@ -30,23 +33,12 @@ export default function HabitBox({ habit, entryId, streak, currentEntriesSnapsho
     }[] = [];
 
     for (let i = startOfWeek(date, { locale: pl }); isBefore(i, endOfWeek(date, { locale: pl })); i = addDays(i, 1))
-        entriesArr.push({ day: format(i, "EEEEEE"), checked: currentEntriesSnapshot.some(e => e.habitId === habit.id && e.date === format(i, 'yyyy-MM-dd')) })
+        entriesArr.push({ day: format(i, "EEEEEE"), checked: entries.some(e => e.habitId === habit.id && e.date === format(i, 'yyyy-MM-dd')) })
 
-    const last30DaysPercent = (() => {
-        let daysDone = 0;
-
-        for (let i = 0; i < 30; i++) {
-            if (currentEntriesSnapshot.some(
-                e => e.habitId === habit.id && e.date === format(subDays(startOfDay(date), i), 'yyyy-MM-dd')
-            ))
-                daysDone++;
-        }
-
-        return (daysDone * 100) / 30;
-    })().toFixed(0);
+    const last30DaysPercent = completionRatePerRange(subDays(date, 30), 30, entries, 1);
 
     return (
-        <Link href={`/habits/${habit.id}`} className="rounded-lg border hover:border-primary p-6 space-y-6">
+        <Link href={`/habits/${habit.id >= 0 ? habit.id : ""}`} className="rounded-lg border hover:border-primary p-6 space-y-6">
             <div className="flex justify-between items-center">
                 <div className="flex gap-4 items-center leading-5">
                     <div className="size-11 bg-primary/15 rounded-lg p-2 flex items-center justify-center text-xl"
@@ -66,7 +58,6 @@ export default function HabitBox({ habit, entryId, streak, currentEntriesSnapsho
                     }}
                     checked={isChecked}
                     className="rounded-xl size-7 cursor-pointer"
-                    disabled={isPending}
                 />
             </div>
             <div className="flex justify-between gap-2">

@@ -6,15 +6,21 @@ import { habitsSchema } from "../validations"
 import { requireSession } from "./session"
 import { formatZodErrors } from "../utils"
 import { cache } from "react"
+import { PrismaClientKnownRequestError } from "@prisma/client/runtime/client"
+import { revalidatePath } from "next/cache"
+import { redirect } from "next/navigation"
+import { isRedirectError } from "next/dist/client/components/redirect-error"
 
 export const getHabitsForCurrentUser = cache(async (): Promise<ServerActionResponse<Habit[]>> => {
-    'use server'
     const session = await requireSession();
 
     try {
         return {
             success: true, data: await prisma.habit.findMany({
                 where: { userId: session.user.id },
+                orderBy: {
+                    createdAt: "asc"
+                }
             })
         };
     } catch (error) {
@@ -24,25 +30,24 @@ export const getHabitsForCurrentUser = cache(async (): Promise<ServerActionRespo
 });
 
 export const getHabit = cache(async (habitId: Habit['id']): Promise<ServerActionResponse<Habit>> => {
-    'use server'
     const session = await requireSession();
 
     try {
         const habit = await prisma.habit.findUnique({
             where: { userId: session.user.id, id: habitId },
         });
+
         if (!habit)
             return { success: false, error: "Habit not found." }
 
         return { success: true, data: habit };
     } catch (error) {
-        console.error("Error fetching habits:", error);
-        return { success: false, error: "Failed to fetch habits." }
+        console.error("Error fetching habit:", error);
+        return { success: false, error: "Failed to fetch habit." }
     }
 })
 
 export async function createHabit(formData: FormData): Promise<ServerActionResponse<Habit>> {
-    'use server'
     const { user } = await requireSession();
 
     const { success, error, data } = await habitsSchema.safeParseAsync({
@@ -71,17 +76,9 @@ export async function createHabit(formData: FormData): Promise<ServerActionRespo
     }
 }
 
-export async function updateHabit(habitId: Habit['id'], formData: FormData): Promise<ServerActionResponse<Habit>> {
-    'use server'
-    await requireSession();
+export const updateHabit = async (habitId: Habit['id'], formData: FormData): Promise<ServerActionResponse<Habit>> => {
+    const { user } = await requireSession();
     try {
-
-        const existingHabit = await prisma.habit.findUnique({
-            where: { id: habitId },
-        });
-        if (!existingHabit)
-            return { success: false, error: "Habit not found." }
-
         const { success, error, data } = await habitsSchema.partial().safeParseAsync({
             name: formData.get('name')?.toString(),
             goal: formData.get('goal')?.toString(),
@@ -93,38 +90,35 @@ export async function updateHabit(habitId: Habit['id'], formData: FormData): Pro
 
         const habit = await prisma.habit.update({
             where: {
-                id: habitId
+                id: habitId,
+                userId: user.id
             },
-            data: {
-                ...data,
-            }
+            data
         })
         return { success: true, data: habit };
     } catch (error) {
-        console.error("Error creating habit:", error);
-        return { success: false, error: "Failed to create habit." }
+        if (error instanceof PrismaClientKnownRequestError && error.code === "P2025")
+            return { success: false, error: "Habit not found." }
+        console.error("Error updating habit:", error);
+        return { success: false, error: "Failed to update habit." }
     }
 }
 
 export async function deleteHabit(habitId: Habit['id']): Promise<ServerActionResponse<null>> {
-    'use server'
-    await requireSession();
+    const { user } = await requireSession();
     try {
-
-        const existingHabit = await prisma.habit.findUnique({
-            where: { id: habitId },
-        });
-        if (!existingHabit)
-            return { success: false, error: "Habit not found." }
-
         await prisma.habit.delete({
             where: {
-                id: habitId
+                id: habitId,
+                userId: user.id
             },
         })
-        return { success: true, data: null };
+        revalidatePath("/habits");
     } catch (error) {
-        console.error("Error creating habit:", error);
-        return { success: false, error: "Failed to create habit." }
+        if (error instanceof PrismaClientKnownRequestError && error.code === "P2025")
+            return { success: false, error: "Habit not found." }
+        console.error("Error deleting habit:", error);
+        return { success: false, error: "Failed to delete habit." }
     }
+    redirect("/habits");
 }

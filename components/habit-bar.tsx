@@ -1,31 +1,31 @@
 "use client"
-import { Entry, Habit } from '@/generated/prisma/client'
+import { Habit } from '@/generated/prisma/client'
 import { Checkbox } from './ui/checkbox'
 import { ChevronRight, Flame } from 'lucide-react'
 import Link from 'next/link'
-import { Dispatch, SetStateAction, useState } from 'react'
-import { useHandleCheck } from '@/lib/hooks/use-handle-check'
+import { useHandleCheck } from '@/hooks/use-handle-check'
+import { useStreakData } from '@/hooks/use-streak-data'
+import { format } from 'date-fns'
+import { useHabit } from '@/lib/store/habit-store'
 
 interface HabitBarProps {
     entryId: number | null
-    streak: number,
-    habit: Habit,
-    onResult: Dispatch<SetStateAction<Entry[]>>
-    currentEntriesSnapshot: Entry[]
+    habitId: Habit['id'],
 }
 
-export default function HabitBar({ habit, entryId, streak, onResult, currentEntriesSnapshot }: HabitBarProps) {
-    const { isPending, isChecked, handleCheck } = useHandleCheck(currentEntriesSnapshot, onResult, habit, entryId);
-    
+export default function HabitBar({ habitId, entryId }: HabitBarProps) {
+    const streak = useStreakData().streakLogs.get(habitId)?.get(format(new Date(), "yyyy-MM-dd")) ?? 0;
+    const habit = useHabit(habitId) as Habit;
+    const { isChecked, handleCheck } = useHandleCheck(habit.id, entryId);
+
     return (
         <div className='flex py-4 items-center border-b gap-4'>
             <Checkbox
                 checked={isChecked}
                 onCheckedChange={() => handleCheck()}
                 className="rounded-xl size-7 cursor-pointer"
-                disabled={isPending}
             />
-            <Link href={`/habits/${habit.id}`} className='flex flex-1 justify-between items-center'>
+            <Link href={`/habits/${habit.id >= 0 ? habit.id : ""}`} className='flex flex-1 justify-between items-center'>
                 <div className='flex gap-4 items-center h-full'>
                     <span className='text-xl'>{habit.icon}</span>
                     <div className='text-sm'>
