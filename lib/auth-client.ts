@@ -1,10 +1,9 @@
 import { createAuthClient } from "better-auth/react"
 import { toast } from "sonner";
-import { getBaseUrl } from "./utils";
 
 export const authClient = createAuthClient({
   /** The base URL of the server (optional if you're using the same domain) */
-  baseURL: getBaseUrl()
+  baseURL: process.env.NEXT_PUBLIC_DOMAIN_NAME
 })
 
 // TO DO: Implement Sentry instead of console.error()
