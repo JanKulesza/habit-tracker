@@ -189,11 +189,11 @@ const LandingPage = async () => {
                     </div>
                 </section>
             </article>
-            <article className="flex flex-col items-center mt-20" data-aos="fade-up">
+            <article className="flex flex-col items-center mt-20">
                 <div className="border border-primary rounded-xl p-1 px-4 text-xs w-fit mb-6 text-primary">Everything you need to succeed</div>
                 <h2 className="text-2xl font-bold">Build habits that stick</h2>
                 <p className="text-muted-foreground text-sm m">Powerful features to help you stay consistent and reach your goals.</p>
-                <div className="flex gap-4 p-8 justify-center w-full">
+                <div className="flex gap-4 p-8 justify-center w-full h-96">
                     {features.map(({ icon: Icon, title, description }, index) => (
                         <Fragment key={title}>
                             <section
