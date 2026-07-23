@@ -2,11 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getSessionCookie } from "better-auth/cookies";
 
 const protectedRoutes = [
-    /^\/$/,
-    /^\/stats$/,
-    /^\/settings$/,
-    /^\/habits$/,
-    /^\/habits\/[^/]+$/
+    /^\/dashboard(?:\/.*)?$/
 ];
 const authRoutes = ["/login", "/register"];
 
@@ -17,8 +13,8 @@ export function proxy(request: NextRequest) {
     if (isRouteProtected && !sessionCookie)
         return NextResponse.redirect(new URL("/login", request.url));
 
-    if (!isRouteProtected && sessionCookie)
-        return NextResponse.redirect(new URL("/", request.url));
+    if (!isRouteProtected && sessionCookie && request.nextUrl.pathname !== '/')
+        return NextResponse.redirect(new URL("/dashboard", request.url));
     
     return NextResponse.next();
 }

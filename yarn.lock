@@ -6320,6 +6320,11 @@ tailwindcss@4.3.1, tailwindcss@^4:
   resolved "https://registry.npmjs.org/tailwindcss/-/tailwindcss-4.3.1.tgz"
   integrity sha512-hk+TB1m+K8CYNrP6rjQaq/Y+4Zylwpa87mLYBKCunwnnQ9p+fHb7kmSfGqyEJoxF/O6CDyABWVFEafNSYKll+Q==
 
+taos@^2.0.1:
+  version "2.0.1"
+  resolved "https://registry.yarnpkg.com/taos/-/taos-2.0.1.tgz#1ff912628b029bf3335076c2958ddc60f10a1e51"
+  integrity sha512-ytj3Z64XnzO4C3MdEmb7ojTUDpqf2WAtw9ktqMdU/2JTXvn75IzzkTjQ0XlRO7BoiQItZ4kFfDHZl+VQiWCAeQ==
+
 tapable@^2.3.3:
   version "2.3.3"
   resolved "https://registry.npmjs.org/tapable/-/tapable-2.3.3.tgz"

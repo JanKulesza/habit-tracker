@@ -130,13 +130,13 @@ export default function HabitDetailsClientPage({ id }: { id: number }) {
                     />
                 )}
             </div>
-            <div className='w-full space-y-4 border rounded-lg p-6'>
+            <div className='w-full space-y-4 border rounded-lg p-6 bg-background'>
                 <h2 className="font-medium">This week</h2>
                 <WeekTiles
                     habitId={habit.id}
                 />
             </div>
-            <div className="w-full min-w-0 space-y-4 border rounded-lg p-6">
+            <div className="w-full min-w-0 space-y-4 border rounded-lg p-6 bg-background">
                 <div className="flex justify-between items-center">
                     <h2 className="font-medium">Activity</h2>
                     <p className="text-muted-foreground text-sm">Last year</p>

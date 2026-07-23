@@ -5,6 +5,7 @@ import { cn } from "@/lib/utils";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { Toaster } from "sonner";
 import { ThemeProvider } from "@/components/theme-provider";
+import Script from "next/script";
 
 const inter = Inter({ subsets: ['latin'], variable: '--font-sans' });
 
@@ -57,6 +58,10 @@ export default function RootLayout({
           </TooltipProvider>
         </ThemeProvider>
       </body>
+      <Script
+        src="https://unpkg.com/taos@1.0.5/dist/taos.js"
+        strategy="afterInteractive"
+      />
     </html>
   );
 }

@@ -12,8 +12,8 @@ async function main() {
         prisma.habit.create({
             data: {
                 icon: "💧",
-                name: "Pij wodę",
-                goal: "Wypij 2 litry dziennie",
+                name: "Drink water",
+                goal: "Drink 2 liters per day",
                 userId: user.id,
                 createdAt: randomPastDate(30)
             }
@@ -21,8 +21,8 @@ async function main() {
         prisma.habit.create({
             data: {
                 icon: "📚",
-                name: "Czytanie 20 min",
-                goal: "Przeczytaj 12 książek w roku",
+                name: "Read 20 min",
+                goal: "Read 12 books this year",
                 userId: user.id,
                 createdAt: randomPastDate(30)
             }
@@ -30,8 +30,8 @@ async function main() {
         prisma.habit.create({
             data: {
                 icon: "💪",
-                name: "Trening",
-                goal: "Ćwicz 3 razy w tygodniu",
+                name: "Workout",
+                goal: "Exercise 3 times per week",
                 userId: user.id,
                 createdAt: randomPastDate(30)
             }
@@ -39,8 +39,8 @@ async function main() {
         prisma.habit.create({
             data: {
                 icon: "🧘",
-                name: "Medytacja",
-                goal: "10 minut dziennie",
+                name: "Meditation",
+                goal: "10 minutes every day",
                 userId: user.id,
                 createdAt: randomPastDate(30)
             }
@@ -48,8 +48,8 @@ async function main() {
         prisma.habit.create({
             data: {
                 icon: "🧠",
-                name: "Nauka języka",
-                goal: "30 minut Duolingo dziennie",
+                name: "Language learning",
+                goal: "30 minutes of Duolingo every day",
                 userId: user.id,
                 createdAt: randomPastDate(30)
             }
@@ -57,8 +57,8 @@ async function main() {
         prisma.habit.create({
             data: {
                 icon: "😴",
-                name: "Sen",
-                goal: "Kładź się spać przed 23:00",
+                name: "Sleep",
+                goal: "Go to bed before 23:00",
                 userId: user.id,
                 createdAt: randomPastDate(30)
             }

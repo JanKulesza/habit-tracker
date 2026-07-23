@@ -1,4 +1,4 @@
-import ProfileCard from "@/app/(dashboard)/settings/card-profile";
+import ProfileCard from "@/app/dashboard/settings/card-profile";
 import { User } from "@/generated/prisma/client";
 import { requireSession } from "@/lib/dal/session";
 import AppearanceCard from "./card-appearance";

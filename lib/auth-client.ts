@@ -10,7 +10,7 @@ export const authClient = createAuthClient({
 export const googleSignIn = async () => {
   const { error } = await authClient.signIn.social({
     provider: "google",
-    callbackURL: `/`,
+    callbackURL: `/dashboard`,
   });
 
   if (error) {
