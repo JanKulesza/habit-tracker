@@ -37,7 +37,7 @@ export default function HomePageClient({ userName }: HomePageCientProps) {
         })();
 
 
-    const { streakLogs, runningStreaks, bestStreaks } = useStreakData();
+    const { runningStreaks, bestStreaks } = useStreakData();
     let bestStreak = 0
     bestStreaks.forEach((val) => bestStreak = val > bestStreak ? val : bestStreak);
 
@@ -83,7 +83,7 @@ export default function HomePageClient({ userName }: HomePageCientProps) {
                     <Button className='p-5 px-8 w-full'> <Plus /> Add habit</Button>
                 </UpsertHabitBtn>
             </div>
-            <div className="w-full space-y-4 border rounded-lg p-6">
+            <div className="w-full space-y-4 border rounded-lg p-6 bg-background">
                 <div className="flex justify-between items-center">
                     <h2 className="font-medium">Progress for today</h2>
                     <p className="text-muted-foreground text-sm">{entriesToday.length}/{habits.length} completed</p>
@@ -110,7 +110,7 @@ export default function HomePageClient({ userName }: HomePageCientProps) {
                 )}
             </div>
             <div className="flex flex-col lg:flex-row gap-8">
-                <div className="w-full lg:w-3/5 space-y-4 border rounded-lg p-6">
+                <div className="w-full lg:w-3/5 space-y-4 border rounded-lg p-6 bg-background">
                     <div className="flex justify-between items-center">
                         <h2 className="font-medium">Habits today</h2>
                         <Link href="/dashboard/habits" className="text-primary text-sm">See all</Link>
@@ -125,11 +125,11 @@ export default function HomePageClient({ userName }: HomePageCientProps) {
                     })}
                 </div>
                 <div className='space-y-8 lg:w-2/5 min-w-0'>
-                    <div className='w-full space-y-4 border rounded-lg p-6'>
+                    <div className='w-full space-y-4 border rounded-lg p-6 bg-background'>
                         <h2 className="font-medium">This week</h2>
                         <WeekTiles />
                     </div>
-                    <div className="w-full min-w-0 space-y-4 border rounded-lg p-6">
+                    <div className="w-full min-w-0 space-y-4 border rounded-lg p-6 bg-background">
                         <div className="flex justify-between items-center">
                             <h2 className="font-medium">Activity</h2>
                             <p className="text-muted-foreground text-sm">Last 20 weeks</p>

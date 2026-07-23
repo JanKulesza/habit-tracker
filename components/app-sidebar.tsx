@@ -11,7 +11,7 @@ export default async function AppSidebar() {
     const { user } = await requireSession();
     return (
         <Sidebar collapsible="icon" className="h-screen">
-            <SidebarHeader className="flex-row justify-start items-center my-4 p-1.5
+            <SidebarHeader className="flex-row justify-start items-center my-4 mt-12 p-1.5
             transition-all duration-300 ease-in-out
             group-data-[state=expanded]:mx-2
             group-data-[state=expanded]:p-2">

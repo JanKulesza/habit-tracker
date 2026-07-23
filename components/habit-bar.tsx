@@ -25,7 +25,7 @@ export default function HabitBar({ habitId, entryId }: HabitBarProps) {
                 onCheckedChange={() => handleCheck()}
                 className="rounded-xl size-7 cursor-pointer"
             />
-            <Link href={`/habits/${habit.id >= 0 ? habit.id : ""}`} className='flex flex-1 justify-between items-center'>
+            <Link href={`/dashboard/habits/${habit.id >= 0 ? habit.id : ""}`} className='flex flex-1 justify-between items-center'>
                 <div className='flex gap-4 items-center h-full'>
                     <span className='text-xl'>{habit.icon}</span>
                     <div className='text-sm'>
