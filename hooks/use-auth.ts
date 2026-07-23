@@ -21,7 +21,7 @@ export const useAuth = () => {
             }
 
             toast.success("Registered successfully.");
-            router.push('/')
+            router.push('/dashboard')
         })
     }
 
@@ -38,7 +38,7 @@ export const useAuth = () => {
             }
 
             toast.success("Logged in successfully.");
-            router.push('/')
+            router.push('/dashboard')
         });
     }
 

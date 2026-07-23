@@ -113,7 +113,7 @@ export default function HomePageClient({ userName }: HomePageCientProps) {
                 <div className="w-full lg:w-3/5 space-y-4 border rounded-lg p-6">
                     <div className="flex justify-between items-center">
                         <h2 className="font-medium">Habits today</h2>
-                        <Link href="/habits" className="text-primary text-sm">See all</Link>
+                        <Link href="/dashboard/habits" className="text-primary text-sm">See all</Link>
                     </div>
                     {habits.map((h) => {
                         const entryId = entriesToday.find(en => en.habitId === h.id)?.id ?? null

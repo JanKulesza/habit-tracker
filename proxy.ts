@@ -2,11 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getSessionCookie } from "better-auth/cookies";
 
 const protectedRoutes = [
-    /^\/$/,
-    /^\/stats$/,
-    /^\/settings$/,
-    /^\/habits$/,
-    /^\/habits\/[^/]+$/
+    /^\/dashboard(?:\/.*)?$/
 ];
 const authRoutes = ["/login", "/register"];
 

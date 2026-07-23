@@ -12,7 +12,7 @@ export default async function HabitsIdPage({ params }: {
   return (
     <>
       <Button asChild variant={"ghost"} className="w-fit">
-        <Link href="/habits"><ChevronLeft />All habits</Link>
+        <Link href="/dashboard/habits"><ChevronLeft />All habits</Link>
       </Button>
       <HabitDetailsClientPage id={id} />
     </>

@@ -1,5 +1,5 @@
 import { SeparatorText } from "@/components/ui/separator-text";
-import GoogleSign from "@/components/inputs/google-sign";
+import GoogleSign from "@/components/buttons/google-sign";
 import LoginForm from "./form";
 export default function LoginPage() {
   return (
