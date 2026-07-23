@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button"
 import { auth } from "@/lib/auth";
-import { ArrowRight, ChartColumn, Check, DoorOpen, Star, Zap } from "lucide-react"
+import { ArrowRight, BarChart2, Bell, ChartColumn, Check, DoorOpen, Flame, Star, Target, Zap } from "lucide-react"
 import { headers } from "next/headers";
 import Image from "next/image";
 import Link from "next/link"
@@ -9,11 +9,36 @@ import statsImg from "@/public/stats.png";
 import habitDetailImg from "@/public/habit-detail.png";
 import { AvatarGroup, AvatarImage, AvatarFallback, Avatar } from "@/components/ui/avatar";
 import SignOutBtn from "@/components/buttons/sign-out-btn";
+import { Separator } from "@/components/ui/separator";
+import { Fragment } from "react/jsx-runtime";
 
 const LandingPage = async () => {
     const session = await auth.api.getSession({ headers: await headers() });
+
+    const features = [
+        {
+            icon: Flame,
+            title: "Build Consistency",
+            description: "Track daily habits and build unbreakable streaks.",
+        },
+        {
+            icon: BarChart2,
+            title: "See Your Progress",
+            description: "Visualize your progress and celebrate small wins.",
+        },
+        {
+            icon: Bell,
+            title: "Stay Motivated",
+            description: "Smart reminders and insights keep you on track.",
+        },
+        {
+            icon: Target,
+            title: "Achieve Your Goals",
+            description: "Turn small actions into lasting results.",
+        },
+    ];
     return (
-        <main className="space-y-8">
+        <main className="space-y-12">
             <nav className="flex justify-between p-8 items-center">
                 <div className="flex gap-4 items-center">
                     <div className="flex items-center justify-center w-12 h-12 rounded-lg bg-primary shrink-0">
@@ -45,13 +70,13 @@ const LandingPage = async () => {
                             <Link href="/dashboard"><ChartColumn /> Your Dashboard  </Link>
                         </Button>
                         <SignOutBtn className="p-5">
-                                <DoorOpen />
+                            <DoorOpen />
                         </SignOutBtn>
                     </div>
                 }
             </nav>
-            <div className="flex gap-10 p-8 items-center">
-                <div className="w-2/5 space-y-6">
+            <article className="flex gap-10 p-8 items-center">
+                <section className="w-2/5 space-y-6">
                     <div className="border border-primary rounded-xl p-1 px-4 text-xs flex gap-3 items-center w-fit"><Star className="text-primary size-4" fill="var(--primary)" /> Build better habits. Every day.</div>
                     <h2 className="text-6xl font-bold">Small habits. <br /> <span className="text-primary">Big changes.</span></h2>
                     <p className="text-muted-foreground">Streak helps you build good habits, break bad ones and stay consistent with what matters most.</p>
@@ -104,10 +129,9 @@ const LandingPage = async () => {
                             <p className="text-muted-foreground text-sm">Trusted by 50,000+ habit builders worldwide.</p>
                         </div>
                     </div>
-                </div>
-                <div className="w-3/5 flex items-center justify-center">
+                </section>
+                <section className="w-3/5 flex items-center justify-center">
                     <div className="relative w-full h-full">
-
                         <Image
                             src={dashboardImg}
                             alt="Dashboard"
@@ -117,7 +141,7 @@ const LandingPage = async () => {
                               top-1/2
                               -translate-x-1/2
                               -translate-y-1/2
-                              w-[720px]
+                              w-180
                               rounded-3xl
                               border
                               shadow-2xl
@@ -132,7 +156,7 @@ const LandingPage = async () => {
                               absolute
                               top-30
                               left-6
-                              w-[260px]
+                              w-65
                               rounded-3xl
                               border
                               shadow-xl
@@ -153,18 +177,50 @@ const LandingPage = async () => {
                                 border
                                 shadow-xl
                                 z-30
-                                rotate-[6deg]
+                                rotate-6
                             "
                         />
 
                         {/* Glow */}
                         <div className="absolute inset-0 -z-10 flex items-center justify-center">
-                            <div className="h-[420px] w-[420px] rounded-full bg-primary/20 blur-[120px]" />
+                            <div className="h-105 w-150 rounded-full bg-primary blur-3xl" />
                         </div>
 
                     </div>
+                </section>
+            </article>
+            <article className="flex flex-col items-center mt-20" data-aos="fade-up">
+                <div className="border border-primary rounded-xl p-1 px-4 text-xs w-fit mb-6 text-primary">Everything you need to succeed</div>
+                <h2 className="text-2xl font-bold">Build habits that stick</h2>
+                <p className="text-muted-foreground text-sm m">Powerful features to help you stay consistent and reach your goals.</p>
+                <div className="flex gap-4 p-8 justify-center w-full">
+                    {features.map(({ icon: Icon, title, description }, index) => (
+                        <Fragment key={title}>
+                            <section
+                                className="flex w-1/5 flex-col items-center rounded-2xl p-6 justify-center
+                                transition-all duration-300 hover:-translate-y-2 hover:bg-muted/40
+                                opacity-0 translate-y-8 duration-700 taos:opacity-100 taos:translate-y-0
+                                "
+                                data-taos-offset={index * 100}
+                            >
+                                <div className="mb-5 flex size-20 items-center justify-center rounded-full bg-primary/10">
+                                    <Icon className="size-10 text-primary" />
+                                </div>
+
+                                <h3 className="mb-2 text-lg font-semibold">{title}</h3>
+
+                                <p className="text-sm text-muted-foreground">
+                                    {description}
+                                </p>
+                            </section>
+
+                            {index < features.length - 1 && (
+                                <Separator orientation="vertical" className="my-6" />
+                            )}
+                        </Fragment>
+                    ))}
                 </div>
-            </div>
+            </article>
         </main>
     )
 }
