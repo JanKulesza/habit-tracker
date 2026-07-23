@@ -1,8 +1,11 @@
 import { Button } from "@/components/ui/button"
-import { Zap } from "lucide-react"
+import { auth } from "@/lib/auth";
+import { ChartColumn, Zap } from "lucide-react"
+import { headers } from "next/headers";
 import Link from "next/link"
 
-const LandingPage = () => {
+const LandingPage = async () => {
+    const session = await auth.api.getSession({ headers: await headers() });
     return (
         <>
             <nav className="flex justify-between p-8 items-center">
@@ -22,14 +25,19 @@ const LandingPage = () => {
                     <Link href="/#benefits">Benefits</Link>
                     <Link href="/#tesimonials">Testimonials</Link>
                 </div>
-                <div className="flex gap-4 items-center">
-                    <Button asChild variant="ghost" className="px-8 py-5">
-                        <Link href="/login">Login</Link>
+                {!session
+                    ? <div className="flex gap-4 items-center">
+                        <Button asChild variant="ghost" className="px-8 py-5">
+                            <Link href="/login">Login</Link>
+                        </Button>
+                        <Button asChild className="px-8 py-5">
+                            <Link href="/register">Register</Link>
+                        </Button>
+                    </div>
+                    : <Button asChild className="px-8 py-5">
+                        <Link href="/dashboard"><ChartColumn /> Your Dashboard  </Link>
                     </Button>
-                    <Button asChild className="px-8 py-5">
-                        <Link href="/register">Register</Link>
-                    </Button>
-                </div>
+                }
             </nav>
         </>
     )
